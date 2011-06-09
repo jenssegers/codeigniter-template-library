@@ -4,6 +4,10 @@ class Home extends CI_Controller {
 
 	public function index()
 	{
+		// Enable cache for all partials
+		// This should be your first line if you want cache
+		//$this->template->cache(60, "frontpage");
+		
 		// You can use handy methods to manipulate partials
 		$this->template->title = "Template library";
 		$this->template->title->append(" | test");
@@ -21,14 +25,14 @@ class Home extends CI_Controller {
 		$this->template->content->parse("dashboard_bottom", array("status"=>"not ready yet"));
 		
 		// Cache the sidebar for 60 seconds
-		// You can pass an extra identifier to get different caches for differen pages
-		// It's recommended that you place this before adding content to the partial
+		// You can pass an extra identifier to get different caches for different pages
+		// You should place this above all other sidebar interractions
 		$this->template->sidebar->cache(60, "frontpage");
 		
 		// Load widgets into partials
-		$this->template->sidebar->widget("advertisement", array("size"=>"small", "position"=>"sidebar"));
 		$this->template->sidebar->widget("random_quote");
-
+		$this->template->sidebar->widget("advertisement", array("size"=>"small", "position"=>"sidebar"));
+		
 		// Publish the template using the default layout file from config
 		$this->template->publish();
 	}

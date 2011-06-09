@@ -6,10 +6,21 @@ class w_random_quote extends Widget {
 		
 		/* Load stuff from Codeigniter */
 		// $this->load->model("m_quotes");
-		// $text = $this->m_quotes->random();
+		// $quotes = $this->m_quotes->all();
 		
-		$text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris eget turpis vel augue tincidunt sollicitudin. Aliquam semper ligula eu risus rutrum quis facilisis nulla bibendum. Aenean pretium purus ac massa adipiscing sit amet convallis odio aliquet. Aliquam erat volutpat. Proin est sem, euismod at consectetur ut, pellentesque a mi. Duis vehicula risus ac risus ultricies vel suscipit nisi consectetur. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Fusce dui felis, venenatis sit amet posuere vel, suscipit a mauris. Pellentesque ac sapien et orci pellentesque pellentesque nec ut orci. Proin eu mi dolor. Praesent vel risus dui, sit amet eleifend tortor. Sed non nibh a lectus hendrerit tempor id sit amet lacus. ";
-		$this->view("widgets/quote", array("text"=>$text));
+		$this->load->helper("text");
+		
+		$quotes[] = array("person"=>"Eric Cartman", "quote"=>"It's a man's obligation to stick his boneration in a women's separation; this sort of penetration will increase the population of the younger generation.");
+		$quotes[] = array("person"=>"Mr Garrison (on women's period)", "quote"=>"I just don't trust anything that bleeds for five days and doesn't die.");
+		$quotes[] = array("person"=>"Eric Cartman", "quote"=>"Respect My Authority!");
+		$quotes[] = array("person"=>"Kyle", "quote"=>"You bastards.");
+		$quotes[] = array("person"=>"Eric Cartman", "quote"=>"You so much as TOUCH kitty's ass, and I'll put a firecracker in your nutsack and blow your balls all over your pants.");
+		$quotes[] = array("person"=>"Eric Cartman", "quote"=>"You seem a little irritable, Kyle. You got some sand in your vagina?");
+		$quotes[] = array("person"=>"Eric Cartman", "quote"=>"How 'bout we sing, 'Kyle's Mom is a stupid bitch' in D Minor.");
+		
+		$quote = $quotes[array_rand($quotes)];
+		
+		$this->view("widgets/quote", $quote);
 	}
 	
 }

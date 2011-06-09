@@ -8,8 +8,11 @@ class w_advertisement extends Widget {
 		// $this->load->model("m_advertisement");
 		// $text = $this->m_advertisement->get($args["position"]);
 		
-		$text = "This codeigniter template library is cool!";
-		$this->view("widgets/advertisement",array("text"=>$text, "id"=>"advertisement_".$args["size"]));
+		$data["title"] = "Template Library";
+		$data["text"] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris eget turpis vel augue tincidunt sollicitudin.";
+		$data["id"] = "advertisement_".$args["size"];
+		
+		$this->view("widgets/advertisement",$data);
 	}
 	
 }

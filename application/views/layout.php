@@ -10,11 +10,13 @@
 </head>
 <body>
 
-<div id="container">
+<div id="top">
 	<div id="menu">
 		<?php echo $this->template->menu->view("menu", array("key"=>"value")); ?>
 	</div>
+</div>
 
+<div id="container">
 	<div id="content">
 	
 	<?php
@@ -35,7 +37,11 @@
 	<div id="sidebar">
 		<?php echo $this->template->sidebar; ?>
 	</div>
+	
+	<div id="footer">Template rendered in {elapsed_time} seconds</div>
 </div>
+
+
 
 <?php echo $this->template->javascript; ?>
 </body>

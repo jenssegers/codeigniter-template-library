@@ -19,7 +19,8 @@ class Template {
 		if (! empty($config))
 			$this->initialize($config);
 		
-		$this->_ci->load->helper('url');
+		if ( !function_exists("base_url"))
+			$this->_ci->load->helper('url');
 		
 		log_message('debug', 'Template Library Initialized');
 	}
@@ -34,8 +35,8 @@ class Template {
 			$this->{'_' . $key} = $val;
 		}
 		
-		if ($this->_parser)
-			$this->_ci->load->library("parser");
+		if ($this->_parser && !class_exists('CI_Parser'))
+			$this->_ci->load->library('parser');
 	}
 	
 	/**
@@ -61,7 +62,7 @@ class Template {
 	 * @param string $index
 	 * @return boolean
 	 */
-	private function partial_exists($index) {
+	private function exists($index) {
 		return array_key_exists($index, $this->_partials);
 	}
 	
@@ -96,7 +97,7 @@ class Template {
 	 * @return Partial
 	 */
 	public function partial($name, $default = "") {
-		if ($this->partial_exists($name))
+		if ($this->exists($name))
 			$partial = $this->_partials[$name];
 		else {
 			$partial = new Partial($name);
@@ -170,6 +171,19 @@ class Template {
 				$this->partial("meta")->append("\n\t" . '<link rel="' . $name . '" href="' . $value . '" />');
 				break;
 		}
+	}
+	
+	/**
+	 * Enable cache for all partials with TTL, default TTL is 60
+	 * @param int $ttl
+	 * @param mixed $identifier
+	 */
+	public function cache($ttl = 60, $identifier = "") {
+		foreach ($this->_partials as $partial) {
+			$partial->cache($ttl, $identifier);
+		}
+		
+		$this->_ttl = $ttl;
 	}
 }
 
@@ -295,7 +309,10 @@ class Partial {
 	 */
 	public function parse($view, $data = array(), $overwrite = false) {
 		if (! $this->_cached) {
-			$this->_ci->load->library("parser");
+			
+			if(!class_exists('CI_Parser'))
+				$this->_ci->load->library("parser");
+				
 			$content = $this->_ci->parser->parse($view, array_merge($this->_args, $data), true);
 			
 			if ($overwrite)
@@ -329,14 +346,19 @@ class Partial {
 	/**
 	 * Enable cache with TTL, default TTL is 60
 	 * @param int $ttl
+	 * @param mixed $identifier
 	 */
 	public function cache($ttl = 60, $identifier = "") {
-		$this->_ci->load->driver('cache', array('adapter' => 'file'));
+		if(!class_exists("CI_Cache"))
+			$this->_ci->load->driver('cache', array('adapter' => 'file'));
+			
 		$this->_ttl = $ttl;
 		$this->_identifier = $identifier;
 		
-		if ($this->_content = $this->_ci->cache->get($this->cache_id()))
+		if ($cached = $this->_ci->cache->get($this->cache_id())) {
 			$this->_cached = true;
+			$this->_content = $cached;
+		}
 		
 		return $this;
 	}
