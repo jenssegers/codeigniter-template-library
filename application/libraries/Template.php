@@ -100,7 +100,7 @@ class Template {
 			$partial = $this->_partials[$name];
 		else {
 			$partial = new Partial($name);
-			if($this->_ttl)
+			if ($this->_ttl)
 				$partial->cache($this->_ttl);
 			$this->_partials[$name] = $partial;
 		}
@@ -175,7 +175,7 @@ class Template {
 
 class Partial {
 	
-	protected $_ci, $_content, $_name, $_ttl = 0, $_cached = false;
+	protected $_ci, $_content, $_name, $_ttl = 0, $_cached = false, $_identifier;
 	protected $_args = array();
 	
 	/**
@@ -211,10 +211,10 @@ class Partial {
 	 * @return string
 	 */
 	public function content() {
-		if($this->_ttl && !$this->_cached) {
-			$this->cache->save($this->identification(), 'CACHED:'.$this->_content, $this->_ttl);
+		if ($this->_ttl && ! $this->_cached) {
+			$this->cache->save($this->cache_id(), $this->_content, $this->_ttl);
 		}
-
+		
 		return $this->_content;
 	}
 	
@@ -224,9 +224,9 @@ class Partial {
 	 * @return Partial
 	 */
 	public function set($content) {
-		if(!$this->_cached)
+		if (! $this->_cached)
 			$this->_content = (string) $content;
-			
+		
 		return $this;
 	}
 	
@@ -236,9 +236,9 @@ class Partial {
 	 * @return Partial
 	 */
 	public function append($content) {
-		if(!$this->_cached)
+		if (! $this->_cached)
 			$this->_content .= (string) $content;
-			
+		
 		return $this;
 	}
 	
@@ -248,9 +248,9 @@ class Partial {
 	 * @return Partial
 	 */
 	public function prepend($content) {
-		if(!$this->_cached)
+		if (! $this->_cached)
 			$this->_content = (string) $content . $this->_content;
-			
+		
 		return $this;
 	}
 	
@@ -260,8 +260,8 @@ class Partial {
 	 * @return Partial
 	 */
 	public function if_empty($default) {
-		if(!$this->_cached)
-			if(!$this->_content)
+		if (! $this->_cached)
+			if (! $this->_content)
 				$this->_content = $default;
 		
 		return $this;
@@ -275,7 +275,7 @@ class Partial {
 	 * @return Partial
 	 */
 	public function view($view, $data = array(), $overwrite = false) {
-		if(!$this->_cached) {
+		if (! $this->_cached) {
 			$content = $this->_ci->load->view($view, array_merge($this->_args, $data), true);
 			
 			if ($overwrite)
@@ -294,7 +294,7 @@ class Partial {
 	 * @return Partial
 	 */
 	public function parse($view, $data = array(), $overwrite = false) {
-		if(!$this->_cached) {
+		if (! $this->_cached) {
 			$this->_ci->load->library("parser");
 			$content = $this->_ci->parser->parse($view, array_merge($this->_args, $data), true);
 			
@@ -314,7 +314,7 @@ class Partial {
 	 * @return Partial
 	 */
 	public function widget($name, $data = array(), $overwrite = false) {
-		if(!$this->_cached) {
+		if (! $this->_cached) {
 			$widget = $this->template->widget($name, $data);
 			
 			if ($overwrite)
@@ -330,13 +330,14 @@ class Partial {
 	 * Enable cache with TTL, default TTL is 60
 	 * @param int $ttl
 	 */
-	public function cache($ttl = 60) {
+	public function cache($ttl = 60, $identifier = "") {
 		$this->_ci->load->driver('cache', array('adapter' => 'file'));
 		$this->_ttl = $ttl;
+		$this->_identifier = $identifier;
 		
-		if($this->_content = $this->_ci->cache->get($this->identification()))
+		if ($this->_content = $this->_ci->cache->get($this->cache_id()))
 			$this->_cached = true;
-			
+		
 		return $this;
 	}
 	
@@ -344,8 +345,11 @@ class Partial {
 	 * Used for cache identification
 	 * @return string
 	 */
-	private function identification() {
-		return $this->_name.'_'.md5(get_class($this).implode('',$this->_args));
+	private function cache_id() {
+		if ($this->_identifier)
+			return $this->_name . '_' . $this->_identifier . '_' . md5(get_class($this) . implode('', $this->_args));
+		else
+			return $this->_name . '_' . md5(get_class($this) . implode('', $this->_args));
 	}
 }
 
@@ -355,7 +359,7 @@ class Widget extends Partial {
 	 * @see Partial::content()
 	 */
 	public function content() {
-		if(!$this->_cached) {
+		if (! $this->_cached) {
 			if (method_exists($this, "display"))
 				$this->display($this->_args);
 		}

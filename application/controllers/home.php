@@ -20,6 +20,11 @@ class Home extends CI_Controller {
 		$this->template->content->view("dashboard", array('title'=>"Dashboard"));
 		$this->template->content->parse("dashboard_bottom", array("status"=>"not ready yet"));
 		
+		// Cache the sidebar for 60 seconds
+		// You can pass an extra identifier to get different caches for differen pages
+		// It's recommended that you place this before adding content to the partial
+		$this->template->sidebar->cache(60, "frontpage");
+		
 		// Load widgets into partials
 		$this->template->sidebar->widget("advertisement", array("size"=>"small", "position"=>"sidebar"));
 		$this->template->sidebar->widget("random_quote");
