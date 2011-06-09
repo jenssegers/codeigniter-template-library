@@ -66,8 +66,8 @@ class Template {
 	}
 	
 	/**
-	 * Publish the current template with the current partials
-	 * You can manually pass a layout file with extra data, or use the default layout from config file
+	 * Publish the template with the current partials
+	 * You can manually pass a layout file with extra data, or use the default layout from the config file
 	 * @param string $layout
 	 * @param array $data
 	 */
@@ -135,7 +135,7 @@ class Template {
 		if (! stristr($source, "http"))
 			$source = base_url() . $source;
 		
-		$this->partial("stylesheet")->append('<link rel="stylesheet" type="text/css" href="' . $source . '" />');
+		$this->partial("stylesheet")->append("\n\t" . '<link rel="stylesheet" type="text/css" href="' . $source . '" />');
 	}
 	
 	/**
@@ -146,7 +146,7 @@ class Template {
 		if (! stristr($source, "http"))
 			$source = base_url() . $source;
 		
-		$this->partial("javascript")->append('<script type="text/javascript" src="' . $source . '"></script>');
+		$this->partial("javascript")->append("\n\t" . '<script type="text/javascript" src="' . $source . '"></script>');
 	}
 	
 	/**
@@ -157,17 +157,17 @@ class Template {
 	 */
 	public function add_meta($name, $value, $type = "meta") {
 		$name = htmlspecialchars(strip_tags($name));
-		$content = htmlspecialchars(strip_tags($content));
+		$value = htmlspecialchars(strip_tags($value));
 		
-		if ($name == 'keywords' and ! strpos($content, ','))
-			$content = preg_replace('/[\s]+/', ', ', trim($content));
+		if ($name == 'keywords' and ! strpos($value, ','))
+			$content = preg_replace('/[\s]+/', ', ', trim($value));
 		
 		switch ($type) {
 			case 'meta' :
-				$this->partial("meta")->append('<meta name="' . $name . '" content="' . $content . '" />');
+				$this->partial("meta")->append("\n\t" . '<meta name="' . $name . '" content="' . $value . '" />');
 				break;
 			case 'link' :
-				$this->partial("meta")->append('<link rel="' . $name . '" href="' . $content . '" />');
+				$this->partial("meta")->append("\n\t" . '<link rel="' . $name . '" href="' . $value . '" />');
 				break;
 		}
 	}
@@ -237,7 +237,7 @@ class Partial {
 	 */
 	public function append($content) {
 		if(!$this->_cached)
-			$this->_content .= "\n" . (string) $content;
+			$this->_content .= (string) $content;
 			
 		return $this;
 	}
@@ -249,8 +249,16 @@ class Partial {
 	 */
 	public function prepend($content) {
 		if(!$this->_cached)
-			$this->_content = (string) $content . "\n" . $this->_content;
+			$this->_content = (string) $content . $this->_content;
 			
+		return $this;
+	}
+	
+	public function if_empty($default) {
+		if(!$this->_cached)
+			if(!$this->_content)
+				$this->_content = $default;
+		
 		return $this;
 	}
 	
