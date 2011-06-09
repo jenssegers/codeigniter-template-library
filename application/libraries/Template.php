@@ -140,7 +140,7 @@ class Template {
 	
 	/**
 	 * Add a javascript source
-	 * @param unknown_type $source
+	 * @param string $source
 	 */
 	public function add_js($source) {
 		if (! stristr($source, "http"))
@@ -254,6 +254,11 @@ class Partial {
 		return $this;
 	}
 	
+	/**
+	 * Set content if partial is empty
+	 * @param mixed $default
+	 * @return Partial
+	 */
 	public function if_empty($default) {
 		if(!$this->_cached)
 			if(!$this->_content)
