@@ -107,7 +107,7 @@ class Template {
 			if ($this->_ttl)
 				$partial->cache($this->_ttl);
 			
-			// Detect local triggers
+		// Detect local triggers
 			if (method_exists($this, "trigger_" . $name))
 				$partial->set_trigger($this, "trigger_" . $name);
 			
@@ -283,10 +283,7 @@ class Partial {
 	 * @return Partial
 	 */
 	public function add() {
-		if (! $this->_cached)
-			$this->_content .= (string) $this->trigger(func_get_args());
-		
-		return $this;
+		return call_user_func_array(array($this, "append"), func_get_args());
 	}
 	
 	/**
@@ -342,7 +339,6 @@ class Partial {
 	 */
 	public function parse($view, $data = array(), $overwrite = false) {
 		if (! $this->_cached) {
-			
 			if (! class_exists('CI_Parser'))
 				$this->_ci->load->library("parser");
 			
@@ -372,7 +368,6 @@ class Partial {
 			else
 				$this->append($widget->content());
 		}
-		
 		return $this;
 	}
 	
@@ -392,7 +387,6 @@ class Partial {
 			$this->_cached = true;
 			$this->_content = $cached;
 		}
-		
 		return $this;
 	}
 	
@@ -408,25 +402,32 @@ class Partial {
 	}
 	
 	/**
-	 * Triggers returns the result if a trigger is set
+	 * Trigger returns the result if a trigger is set
+	 * @param array $args
+	 * @return string
 	 */
 	private function trigger($args) {
-		if(!$this->_trigger)
+		if (! $this->_trigger)
 			return implode('', $args);
+		else if (count($this->_trigger) == 1) {
+			return call_user_func_array(reset($this->_trigger), $args);
+		}
 		else if (count($this->_trigger) >= 2) {
 			$obj = array_shift($this->_trigger);
 			$func = array_pop($this->_trigger);
-			foreach ($this->_trigger as $trigger) {
+			
+			foreach ($this->_trigger as $trigger)
 				$obj = $obj->$trigger;
-			}
-			return call_user_func_array(array($obj, $func),$args);
-		} else if (count($this->_trigger) == 1)
-			return call_user_func_array(reset($this->_trigger),$args);
+			
+			return call_user_func_array(array($obj, $func), $args);
+		}
+		return "";
 	}
 	
 	/**
 	 * Set a trigger function
 	 * Can be used like set_trigger($this, "function"); or set_trigger("function");
+	 * @param mixed $arg
 	 */
 	public function set_trigger() {
 		if (func_num_args())
