@@ -7,7 +7,7 @@ class Template {
 	private $_ci;
 	private $_partials = array();
 	
-	private $_layout, $_parser, $_ttl = 0;
+	private $_layout, $_parser = FALSE, $_widget_prefix = "w_", $_ttl = 0;
 	
 	/**
 	 * Construct with configuration array. Codeigniter will use the config file otherwise
@@ -19,7 +19,7 @@ class Template {
 		if (! empty($config))
 			$this->initialize($config);
 		
-		if ( !function_exists("base_url"))
+		if (! function_exists("base_url"))
 			$this->_ci->load->helper('url');
 		
 		log_message('debug', 'Template Library Initialized');
@@ -35,7 +35,7 @@ class Template {
 			$this->{'_' . $key} = $val;
 		}
 		
-		if ($this->_parser && !class_exists('CI_Parser'))
+		if ($this->_parser && ! class_exists('CI_Parser'))
 			$this->_ci->load->library('parser');
 	}
 	
@@ -77,6 +77,9 @@ class Template {
 			$data = $layout;
 		else if ($layout)
 			$this->_layout = $layout;
+		
+		if (! $this->_layout)
+			show_error("There was no layout file selected for the current template");
 		
 		if (! empty($data))
 			$this->_partials = array_merge($this->_partials, $data);
@@ -120,7 +123,7 @@ class Template {
 	 * @return Widget
 	 */
 	public function widget($name, $data = array()) {
-		$class = "w_" . $name;
+		$class = $this->_widget_prefix . $name;
 		if (! class_exists($class))
 			require_once (APPPATH . "widgets/" . $name . EXT);
 		$widget = new $class($name, $data);
@@ -310,9 +313,9 @@ class Partial {
 	public function parse($view, $data = array(), $overwrite = false) {
 		if (! $this->_cached) {
 			
-			if(!class_exists('CI_Parser'))
+			if (! class_exists('CI_Parser'))
 				$this->_ci->load->library("parser");
-				
+			
 			$content = $this->_ci->parser->parse($view, array_merge($this->_args, $data), true);
 			
 			if ($overwrite)
@@ -349,9 +352,9 @@ class Partial {
 	 * @param mixed $identifier
 	 */
 	public function cache($ttl = 60, $identifier = "") {
-		if(!class_exists("CI_Cache"))
+		if (! class_exists("CI_Cache"))
 			$this->_ci->load->driver('cache', array('adapter' => 'file'));
-			
+		
 		$this->_ttl = $ttl;
 		$this->_identifier = $identifier;
 		
