@@ -14,11 +14,11 @@ class Home extends CI_Controller {
 		$this->template->title->prepend("Codeigniter ");
 		
 		// Stylesheet and javascript
-		$this->template->add_css("css/stylesheet.css");
-		$this->template->add_js("javasccript/custom.js");
+		$this->template->stylesheet->add("css/stylesheet.css");
+		$this->template->javascript->add("javasccript/custom.js");
 		
 		// Meta data
-		$this->template->add_meta("robots", "index,follow");
+		$this->template->meta->add("robots", "index,follow");
 		
 		// Load or parse views into partials
 		$this->template->content->view("dashboard", array('title'=>"Dashboard"));
@@ -30,8 +30,12 @@ class Home extends CI_Controller {
 		$this->template->sidebar->cache(60, "frontpage");
 		
 		// Load widgets into partials
-		$this->template->sidebar->widget("random_quote");
 		$this->template->sidebar->widget("advertisement", array("size"=>"small", "position"=>"sidebar"));
+		$this->template->sidebar->widget("random_quote");
+		
+		// Trigger example
+		$this->template->sidebar->set_trigger("strtoupper");
+		$this->template->sidebar->append("this is lowercase text");
 		
 		// Publish the template using the default layout file from config
 		$this->template->publish();

@@ -106,6 +106,11 @@ class Template {
 			$partial = new Partial($name);
 			if ($this->_ttl)
 				$partial->cache($this->_ttl);
+			
+			// Detect local triggers
+			if (method_exists($this, "trigger_" . $name))
+				$partial->set_trigger($this, "trigger_" . $name);
+			
 			$this->_partials[$name] = $partial;
 		}
 		
@@ -132,51 +137,6 @@ class Template {
 	}
 	
 	/**
-	 * Add a css source
-	 * @param string $source
-	 */
-	public function add_css($source) {
-		if (! stristr($source, "http"))
-			$source = base_url() . $source;
-		
-		$this->partial("stylesheet")->append("\n\t" . '<link rel="stylesheet" type="text/css" href="' . $source . '" />');
-	}
-	
-	/**
-	 * Add a javascript source
-	 * @param string $source
-	 */
-	public function add_js($source) {
-		if (! stristr($source, "http"))
-			$source = base_url() . $source;
-		
-		$this->partial("javascript")->append("\n\t" . '<script type="text/javascript" src="' . $source . '"></script>');
-	}
-	
-	/**
-	 * Add meta data
-	 * @param string $name
-	 * @param mixed $value
-	 * @param enum $type
-	 */
-	public function add_meta($name, $value, $type = "meta") {
-		$name = htmlspecialchars(strip_tags($name));
-		$value = htmlspecialchars(strip_tags($value));
-		
-		if ($name == 'keywords' and ! strpos($value, ','))
-			$content = preg_replace('/[\s]+/', ', ', trim($value));
-		
-		switch ($type) {
-			case 'meta' :
-				$this->partial("meta")->append("\n\t" . '<meta name="' . $name . '" content="' . $value . '" />');
-				break;
-			case 'link' :
-				$this->partial("meta")->append("\n\t" . '<link rel="' . $name . '" href="' . $value . '" />');
-				break;
-		}
-	}
-	
-	/**
 	 * Enable cache for all partials with TTL, default TTL is 60
 	 * @param int $ttl
 	 * @param mixed $identifier
@@ -188,11 +148,69 @@ class Template {
 		
 		$this->_ttl = $ttl;
 	}
+	
+	/**
+	 * Stylesheet trigger
+	 * @param string $source
+	 */
+	public function trigger_stylesheet($source) {
+		if (! stristr($source, "http"))
+			$source = base_url() . $source;
+		
+		return "\n\t" . '<link rel="stylesheet" type="text/css" href="' . htmlspecialchars(strip_tags($source)) . '" />';
+	}
+	
+	/**
+	 * Javascript trigger
+	 * @param string $source
+	 */
+	public function trigger_javascript($source) {
+		if (! stristr($source, "http"))
+			$source = base_url() . $source;
+		
+		return "\n\t" . '<script type="text/javascript" src="' . htmlspecialchars(strip_tags($source)) . '"></script>';
+	}
+	
+	/**
+	 * Meta trigger
+	 * @param string $name
+	 * @param mixed $value
+	 * @param enum $type
+	 */
+	public function trigger_meta($name, $value, $type = "meta") {
+		$name = htmlspecialchars(strip_tags($name));
+		$value = htmlspecialchars(strip_tags($value));
+		
+		if ($name == 'keywords' and ! strpos($value, ','))
+			$content = preg_replace('/[\s]+/', ', ', trim($value));
+		
+		switch ($type) {
+			case 'meta' :
+				$content = "\n\t" . '<meta name="' . $name . '" content="' . $value . '" />';
+				break;
+			case 'link' :
+				$content = "\n\t" . '<link rel="' . $name . '" href="' . $value . '" />';
+				break;
+		}
+		
+		return $content;
+	}
+	
+	/**
+	 * Title trigger, keeps it clean
+	 * @param string $name
+	 * @param mixed $value
+	 * @param enum $type
+	 */
+	public function trigger_title($title) {
+		return htmlspecialchars(strip_tags($title));
+	}
+
 }
 
 class Partial {
 	
-	protected $_ci, $_content, $_name, $_ttl = 0, $_cached = false, $_identifier;
+	protected $_ci, $_content, $_name, $_ttl = 0, $_cached = false, $_identifier, $_trigger;
 	protected $_args = array();
 	
 	/**
@@ -240,9 +258,9 @@ class Partial {
 	 * @param mixed $content
 	 * @return Partial
 	 */
-	public function set($content) {
+	public function set() {
 		if (! $this->_cached)
-			$this->_content = (string) $content;
+			$this->_content = (string) $this->trigger(func_get_args());
 		
 		return $this;
 	}
@@ -252,9 +270,21 @@ class Partial {
 	 * @param mixed $content
 	 * @return Partial
 	 */
-	public function append($content) {
+	public function append() {
 		if (! $this->_cached)
-			$this->_content .= (string) $content;
+			$this->_content .= (string) $this->trigger(func_get_args());
+		
+		return $this;
+	}
+	
+	/**
+	 * Append alias method
+	 * @param mixed $content
+	 * @return Partial
+	 */
+	public function add() {
+		if (! $this->_cached)
+			$this->_content .= (string) $this->trigger(func_get_args());
 		
 		return $this;
 	}
@@ -264,9 +294,9 @@ class Partial {
 	 * @param mixed $content
 	 * @return Partial
 	 */
-	public function prepend($content) {
+	public function prepend() {
 		if (! $this->_cached)
-			$this->_content = (string) $content . $this->_content;
+			$this->_content = (string) $this->trigger(func_get_args()) . $this->_content;
 		
 		return $this;
 	}
@@ -375,6 +405,32 @@ class Partial {
 			return $this->_name . '_' . $this->_identifier . '_' . md5(get_class($this) . implode('', $this->_args));
 		else
 			return $this->_name . '_' . md5(get_class($this) . implode('', $this->_args));
+	}
+	
+	/**
+	 * Triggers returns the result if a trigger is set
+	 */
+	private function trigger($args) {
+		if(!$this->_trigger)
+			return implode('', $args);
+		else if (count($this->_trigger) >= 2) {
+			$obj = array_shift($this->_trigger);
+			$func = array_pop($this->_trigger);
+			foreach ($this->_trigger as $trigger) {
+				$obj = $obj->$trigger;
+			}
+			return call_user_func_array(array($obj, $func),$args);
+		} else if (count($this->_trigger) == 1)
+			return call_user_func_array(reset($this->_trigger),$args);
+	}
+	
+	/**
+	 * Set a trigger function
+	 * Can be used like set_trigger($this, "function"); or set_trigger("function");
+	 */
+	public function set_trigger() {
+		if (func_num_args())
+			$this->_trigger = func_get_args();
 	}
 }
 
