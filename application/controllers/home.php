@@ -8,10 +8,16 @@ class Home extends CI_Controller {
 		// This should be your first line if you want cache
 		//$this->template->cache(60, "frontpage");
 		
+		// This method will set a default content if there is no content set yet
+		// So place this line first if you want to manipulate the default content
+		$this->template->title->default("Template library");
+		
 		// You can use handy methods to manipulate partials
-		$this->template->title = "Template library";
 		$this->template->title->append(" | test");
 		$this->template->title->prepend("Codeigniter ");
+		
+		// This will do nothing because there is content set
+		$this->template->title->default("I forgot something");
 		
 		// Stylesheet and javascript
 		$this->template->stylesheet->add("css/stylesheet.css");

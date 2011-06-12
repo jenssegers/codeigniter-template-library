@@ -228,9 +228,17 @@ class Partial {
 	 * This will be handy in extending classes
 	 * @param string $index
 	 */
-	function __get($index) {
-		if (isset($this->_ci->$index))
-			return $this->_ci->$index;
+	function __get($name) {
+		if (isset($this->_ci->$name))
+			return $this->_ci->$name;
+	}
+	
+	function __call($name, $args) {
+		switch ($name) {
+			case "default" :
+				return call_user_func_array(array($this, "set_default"), $args);
+				break;
+		}
 	}
 	
 	/**
@@ -259,8 +267,9 @@ class Partial {
 	 * @return Partial
 	 */
 	public function set() {
-		if (! $this->_cached)
+		if (! $this->_cached) {
 			$this->_content = (string) $this->trigger(func_get_args());
+		}
 		
 		return $this;
 	}
@@ -271,8 +280,9 @@ class Partial {
 	 * @return Partial
 	 */
 	public function append() {
-		if (! $this->_cached)
+		if (! $this->_cached) {			
 			$this->_content .= (string) $this->trigger(func_get_args());
+		}
 		
 		return $this;
 	}
@@ -292,8 +302,9 @@ class Partial {
 	 * @return Partial
 	 */
 	public function prepend() {
-		if (! $this->_cached)
+		if (! $this->_cached) {
 			$this->_content = (string) $this->trigger(func_get_args()) . $this->_content;
+		}
 		
 		return $this;
 	}
@@ -303,10 +314,12 @@ class Partial {
 	 * @param mixed $default
 	 * @return Partial
 	 */
-	public function if_empty($default) {
-		if (! $this->_cached)
-			if (! $this->_content)
+	public function set_default($default) {
+		if (! $this->_cached) {
+			if (! $this->_content || $this->_content = "") {
 				$this->_content = $default;
+			}
+		}
 		
 		return $this;
 	}
