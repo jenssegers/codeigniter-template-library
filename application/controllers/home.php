@@ -42,7 +42,9 @@ class Home extends CI_Controller {
 		
 		// Trigger example
 		$this->template->sidebar->set_trigger("strtoupper");
-		$this->template->sidebar->append("this is lowercase text");
+		$this->template->sidebar->append("this is uppercase text");
+		$this->template->sidebar->set_trigger();
+		$this->template->sidebar->append(", this is lowercase text");
 		
 		// Publish the template using the default layout file from config
 		$this->template->publish();

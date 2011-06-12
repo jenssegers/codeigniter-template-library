@@ -280,7 +280,7 @@ class Partial {
 	 * @return Partial
 	 */
 	public function append() {
-		if (! $this->_cached) {			
+		if (! $this->_cached) {
 			$this->_content .= (string) $this->trigger(func_get_args());
 		}
 		
@@ -445,6 +445,8 @@ class Partial {
 	public function set_trigger() {
 		if (func_num_args())
 			$this->_trigger = func_get_args();
+		else
+			$this->_trigger = FALSE;
 	}
 }
 
