@@ -10,9 +10,10 @@ class Home extends CI_Controller {
 		
 		// This method will set a default content if there is no content set yet
 		// So place this line first if you want to manipulate the default content
-		$this->template->title->default("Template library");
+		$this->template->title->default("Default title");
 		
 		// You can use handy methods to manipulate partials
+		$this->template->title = "Template library";
 		$this->template->title->append(" | test");
 		$this->template->title->prepend("Codeigniter ");
 		
