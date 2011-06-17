@@ -422,19 +422,8 @@ class Partial {
 	private function trigger($args) {
 		if (! $this->_trigger)
 			return implode('', $args);
-		else if (count($this->_trigger) == 1) {
-			return call_user_func_array(reset($this->_trigger), $args);
-		}
-		else if (count($this->_trigger) >= 2) {
-			$obj = array_shift($this->_trigger);
-			$func = array_pop($this->_trigger);
-			
-			foreach ($this->_trigger as $trigger)
-				$obj = $obj->$trigger;
-			
-			return call_user_func_array(array($obj, $func), $args);
-		}
-		return "";
+		else
+			return call_user_func_array($this->_trigger, $args);
 	}
 	
 	/**
@@ -443,8 +432,21 @@ class Partial {
 	 * @param mixed $arg
 	 */
 	public function set_trigger() {
-		if (func_num_args())
-			$this->_trigger = func_get_args();
+		if ($count = func_num_args()) {
+			if ($count >= 2) {
+				$args = func_get_args();
+				$obj = array_shift($args);
+				$func = array_pop($args);
+				
+				foreach ($args as $trigger)
+					$obj = $obj->$trigger;
+				
+				$this->_trigger = array($obj, $func);
+			}
+			else {
+				$this->_trigger = reset(func_get_args());
+			}
+		}
 		else
 			$this->_trigger = FALSE;
 	}
