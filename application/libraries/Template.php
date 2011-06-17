@@ -293,7 +293,8 @@ class Partial {
 	 * @return Partial
 	 */
 	public function add() {
-		return call_user_func_array(array($this, "append"), func_get_args());
+		$args = func_get_args();
+		return call_user_func_array(array($this, "append"), $args);
 	}
 	
 	/**
