@@ -284,9 +284,6 @@ class Partial {
 			case "default" :
 				return call_user_func_array(array($this, "set_default"), $args);
 				break;
-			case "load" :
-				return $this;
-				break;
 		}
 	}
 	
