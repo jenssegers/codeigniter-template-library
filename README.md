@@ -66,9 +66,11 @@ However, I prefer to directly call the library's methods from inside the layout 
 	</body>
 
 These variables are in fact Partial Ojects, so you can still manipulate them from inside the layout view file like this:
+
 	<?php echo $title->prepend("My Website - "); ?>
 
 Partial manipulation methods will always return the partial object itself for further chaining or for displaying. So this is perfectly possible:
+
 	<?php echo $sidebar->cache(500)->widget("login")->prepend("Login: "); ?>
 
 Partial manipulation
