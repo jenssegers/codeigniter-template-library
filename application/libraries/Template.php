@@ -29,10 +29,17 @@ if (! defined("BASEPATH"))
 
 class Template {
 	
+	/* default values */
+	private $_layout = "layout";
+	private $_parser = FALSE;
+	private $_ttl = 0;
+	
+	/* widget class auto-correction */
+	private $_widget_prefix = "";
+	private $_widget_suffix = "_widget";
+	
 	private $_ci;
 	private $_partials = array();
-	
-	private $_layout, $_parser = FALSE, $_widget_prefix = "w_", $_ttl = 0;
 	
 	/**
 	 * Construct with configuration array. Codeigniter will use the config file otherwise
@@ -132,7 +139,7 @@ class Template {
 			if ($this->_ttl)
 				$partial->cache($this->_ttl);
 			
-		// Detect local triggers
+			// detect local triggers
 			if (method_exists($this, "trigger_" . $name))
 				$partial->set_trigger($this, "trigger_" . $name);
 			
@@ -153,9 +160,13 @@ class Template {
 	 * @return Widget
 	 */
 	public function widget($name, $data = array()) {
-		$class = $this->_widget_prefix . $name;
-		if (! class_exists($class))
+		$class = $this->_widget_prefix . $name . $this->_widget_suffix;
+		if (! class_exists($class)) {
+			if(! file_exists(APPPATH . "widgets/" . $name . EXT))
+				show_error("Widget '".$name."' was not found.");
+				
 			require_once (APPPATH . "widgets/" . $name . EXT);
+		}
 		$widget = new $class($name, $data);
 		
 		return $widget;
@@ -230,6 +241,16 @@ class Template {
 	public function trigger_title($title) {
 		return htmlspecialchars(strip_tags($title));
 	}
+	
+	/**
+	 * Title trigger, keeps it clean
+	 * @param string $name
+	 * @param mixed $value
+	 * @param enum $type
+	 */
+	public function trigger_description($description) {
+		return htmlspecialchars(strip_tags($description));
+	}
 
 }
 
@@ -262,6 +283,9 @@ class Partial {
 		switch ($name) {
 			case "default" :
 				return call_user_func_array(array($this, "set_default"), $args);
+				break;
+			case "load" :
+				return $this;
 				break;
 		}
 	}
@@ -342,7 +366,7 @@ class Partial {
 	 */
 	public function set_default($default) {
 		if (! $this->_cached) {
-			if (! $this->_content || $this->_content = "") {
+			if (! $this->_content || $this->_content == "") {
 				$this->_content = $default;
 			}
 		}
