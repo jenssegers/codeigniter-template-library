@@ -86,17 +86,21 @@ Partials have a few handy methods for manipulating their content such as:
     $partial->default() - only set content if empty
 
 You can also load dynamic content inside partials from view files or widgets. The object named partial used in the method chaining below is the name of the partial you want to load the content into.
+
 	$this->template->partial->view()
 
 Append or overwrite the partial with a view file with parameters.
+
 	$this->template->partial->view("partial-name", array(), $overwrite=FALSE);
 	$this->template->partial->parse()
 
 Append or overwrite the partial with a parsed view file with parameters.
+
 	$this->template->partial->parse("partial-name", array(), $overwrite=FALSE);
 	$this->template->partial->widget()
 
 Append or overwrite the partial with a widget's output.
+
 	$this->template->partial->widget("widget-name", array(), $overwrite=FALSE);
 
 Publishing
@@ -105,9 +109,11 @@ Publishing
 The template class only has a few methods. I chose to do this because almost everything can be managed by using the flexible Partial Object. If you want to publish the entire template with the current partials to the output you can use the publish() method.
 
 You can pass a custom layout file and optional data if wanted:
+
 	$this->template->publish("layout", array("title"=>"Title is overwritten!"));
 
 Most of the time this will be empty using the layout file from the config:
+
 	$this->template->publish();
 	
 Triggers
@@ -122,6 +128,7 @@ Some partials have built in triggers:
     description - will convert special characters just like the title
 
 This is an example of what these built in triggers do:
+
 	$this->template->stylesheet->add("stylesheet.css");
 	//<link rel="stylesheet" type="text/css" href="http://myweb.com/stylesheet.css" />
 	 
@@ -135,6 +142,7 @@ This is an example of what these built in triggers do:
 	//Dad &amp; Son
 
 You can set your own triggers for functions or methods for any partial object like this:
+
 	//function
 	$this->template->partial->set_trigger("strtoupper");
 	 
@@ -162,6 +170,7 @@ Widgets are intelligent partial objects. When their content is asked, their disp
 	}
 
 And this is loaded from a controller like this:
+
 	$this->template->partial->widget("hero_widget", $args = array());
 
 Widgets can have a specific prefix or suffix added to their class name to prevent class name duplicates. You can either set it manually from the config file or use the default _widget suffix. The file and widget name you call from the controllers are without the prefix and suffix.
@@ -173,10 +182,13 @@ Caching
 I did not want to expand the library in all different ways, therefore I implemented a basic caching function using Codeigniter's caching driver. This might slow your code down on simple websites but allows you to use caching for partials just like you would do yourself with Codeigniter's driver.
 
 You can cache particular partials:
+
 	$this->template->partial->cache(100);
 
 Or you can cache all partials:
+
 	$this->template->cache(100);
 
 Both methods have an extra optional identification parameter that you can use to have multiple cache files for different pages:
+
 	$this->template->cache(100, "frontpage");
