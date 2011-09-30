@@ -44,28 +44,26 @@ Layout files
 ------------
 
 Layout files are loaded or parsed by Codeigniter and the partials are passed to them as data. You can easily load them like you would normally use data in your view files:
-	<html>
-		<head>
-			<title><?php echo $title; ?></title>
-			<?php echo $stylesheet; ?>
-		</head>
-		<body>
-			<?php echo $content; ?>
-		</body>
-	</html>
+
+	<head>
+		<title><?php echo $title; ?></title>
+		<?php echo $stylesheet; ?>
+	</head>
+	<body>
+		<?php echo $content; ?>
+	</body>
 
 Or when parsing is enabled you can use {content} etc.
 
 However, I prefer to directly call the library's methods from inside the layout file to work around php's Undefined variable errors when you are not setting all partials. Calling these methods well replace non-existing partials with empty one's so you don't get any errors:
-	<html>
-		<head>
-			<title><?php echo $this->template->title; ?></title>
-			<?php echo $this->template->stylesheet; ?>
-		</head>
-		<body>
-			<?php echo $this->template->content; ?>
-		</body>
-	</html>
+
+	<head>
+		<title><?php echo $this->template->title; ?></title>
+		<?php echo $this->template->stylesheet; ?>
+	</head>
+	<body>
+		<?php echo $this->template->content; ?>
+	</body>
 
 These variables are in fact Partial Ojects, so you can still manipulate them from inside the layout view file like this:
 <?php echo $title->prepend("My Website - "); ?>
