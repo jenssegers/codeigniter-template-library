@@ -60,15 +60,11 @@ class Template {
 	/**
 	 * Initialize with configuration array
 	 * @param array $config
-	 * @return Template
 	 */
 	public function initialize($config = array()) {
 		foreach ($config as $key => $val) {
 			$this->{'_' . $key} = $val;
 		}
-		
-		if ($this->_parser && ! class_exists('CI_Parser'))
-			$this->_ci->load->library('parser');
 	}
 	
 	/**
@@ -279,6 +275,9 @@ class Partial {
 			return $this->_ci->$name;
 	}
 	
+	/**
+	 * Workarround to allow a method to be called default
+	 */
 	function __call($name, $args) {
 		switch ($name) {
 			case "default" :

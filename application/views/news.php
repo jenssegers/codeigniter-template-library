@@ -1,4 +1,3 @@
-<!-- Example row of columns -->
 <div class="row">
 	<div class="span6">
 	  <h2>Heading</h2>

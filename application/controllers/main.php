@@ -5,7 +5,10 @@ class Main extends CI_Controller {
 	public function index()
 	{
 		$this->template->stylesheet->add("http://twitter.github.com/bootstrap/1.3.0/bootstrap.min.css");
-		$this->template->content->view("news");
+		
+		$news = array(); // Load from model
+		$this->template->content->view("news", $news);
+		
 		$this->template->copyright = "&copy; Special Company 2011";
 		
 		$this->template->publish();

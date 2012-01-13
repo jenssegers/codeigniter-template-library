@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html class="no-js">
+<html>
 <head>
-	<title><?php echo $this->template->title; ?></title>
+	<title><?php echo $this->template->title->default("Welcome!"); ?></title>
 	<meta charset="utf-8">
 	<meta name="description" content="<?php echo $this->template->description; ?>">
 	<meta name="author" content="">
 	<?php echo $this->template->meta; ?>
 	<?php echo $this->template->stylesheet; ?>
-	<script src="<?php echo base_url(); ?>javascript/modernizr.js"></script>
 </head>
 <body>
 
@@ -27,7 +26,6 @@
 	var base_url = "<?php echo base_url(); ?>";
 	var site_url = "<?php echo site_url(); ?>";
 </script>
-<script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
 <?php echo $this->template->javascript; ?>
 
 </body>
