@@ -91,13 +91,11 @@ You can also load dynamic content inside partials from view files or widgets. Th
 
 Append or overwrite the partial with a view file with parameters.
 
-	$this->template->partial->view("partial-name", array(), $overwrite=FALSE);
-	$this->template->partial->parse()
+	$this->template->partial->view("view-file", array(), $overwrite=FALSE);
 
 Append or overwrite the partial with a parsed view file with parameters.
 
-	$this->template->partial->parse("partial-name", array(), $overwrite=FALSE);
-	$this->template->partial->widget()
+	$this->template->partial->parse("view-file", array(), $overwrite=FALSE);
 
 Append or overwrite the partial with a widget's output.
 
