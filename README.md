@@ -162,12 +162,10 @@ Widgets are intelligent partial objects. When their content is asked, their disp
 	/* File: widgets/hero.php */
 	class hero_widget extends Widget {
 		 public function display($args = array()) {
-			 //$this->prepend("<h1>Slideshow:</h1>");
-	 
 			 $this->load->model("my_model");
 			 $data = $this->my_model->all();
 	 
-			 $this->view("widgets/hero", $data);
+			 $this->load->view("widgets/hero", $data);
 		 }
 	}
 
