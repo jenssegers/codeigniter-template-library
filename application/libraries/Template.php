@@ -48,10 +48,11 @@ class Template {
     public function __construct($config = array()) {
         $this->_ci = & get_instance();
         
-        if (!empty($config))
+        if (!empty($config)) {
             $this->initialize($config);
+        }
         
-        log_message('debug', 'Template Library Initialized');
+        log_message('debug', 'Template library initialized');
     }
     
     /**
@@ -64,8 +65,9 @@ class Template {
             $this->{'_' . $key} = $val;
         }
         
-        if ($this->_parser && !class_exists('CI_Parser'))
+        if ($this->_parser && !class_exists('CI_Parser')) {
             $this->_ci->load->library('parser');
+        }
     }
     
     /**
@@ -110,26 +112,29 @@ class Template {
      * @param array $data
      */
     public function publish($template = FALSE, $data = array()) {
-        if (is_array($template))
+        if (is_array($template)) {
             $data = $template;
-        else if ($template)
+        } else if ($template) {
             $this->_template = $template;
+        }
         
-        if (!$this->_template)
+        if (!$this->_template) {
             show_error("There was no template file selected for the current template");
+        }
         
         if (is_array($data)) {
-            foreach($data as $name => $content) {
+            foreach ($data as $name => $content) {
                 $this->partial($name)->set($content);
             }
         }
         
         unset($data);
         
-        if ($this->_parser)
+        if ($this->_parser) {
             $this->_ci->parser->parse($this->_template, $this->_partials);
-        else
+        } else {
             $this->_ci->load->view($this->_template, $this->_partials);
+        }
     }
     
     /**
@@ -139,24 +144,27 @@ class Template {
      * @param string $default
      * @return Partial
      */
-    public function partial($name, $default = "") {
+    public function partial($name, $default = FALSE) {
         if ($this->exists($name)) {
             $partial = $this->_partials[$name];
         } else {
             // create new partial
             $partial = new Partial($name);
-            if ($this->_ttl)
+            if ($this->_ttl) {
                 $partial->cache($this->_ttl);
+            }
             
             // detect local triggers
-            if (method_exists($this, "trigger_" . $name))
+            if (method_exists($this, "trigger_" . $name)) {
                 $partial->set_trigger($this, "trigger_" . $name);
+            }
             
             $this->_partials[$name] = $partial;
         }
         
-        if (!$partial->content() && $default)
+        if (!$partial->content() && $default) {
             $partial->set($default);
+        }
         
         return $partial;
     }
@@ -181,15 +189,14 @@ class Template {
         // locate and load the widget class
         $class = $this->_widget_prefix . $name . $this->_widget_suffix;
         if (!class_exists($class)) {
-            if (!file_exists($path . $name . '.php'))
+            if (!file_exists($path . $name . '.php')) {
                 show_error("Widget '" . $name . "' was not found.");
+            }
             
             require_once ($path . $name . '.php');
         }
         
-        $widget = new $class($name, $data);
-        
-        return $widget;
+        return new $class($name, $data);
     }
     
     /**
@@ -210,13 +217,15 @@ class Template {
      * @param string $source
      */
     public function trigger_stylesheet($url, $media = FALSE) {
-        if (!stristr($url, "http://"))
+        if (!stristr($url, "http://")) {
             $url = $this->_ci->config->item('base_url') . $url;
+        }
         
-        if ($media)
-            return "\n\t" . '<link rel="stylesheet" href="' . htmlspecialchars(strip_tags($url)) . '" media="' . $media . '" />';
-        else
-            return "\n\t" . '<link rel="stylesheet" href="' . htmlspecialchars(strip_tags($url)) . '" />';
+        if ($media) {
+            return '<link rel="stylesheet" href="' . htmlspecialchars(strip_tags($url)) . '" media="' . $media . '" />' . "\n\t";
+        } else {
+            return '<link rel="stylesheet" href="' . htmlspecialchars(strip_tags($url)) . '" />' . "\n\t";
+        }
     }
     
     /**
@@ -224,10 +233,11 @@ class Template {
      * @param string $source
      */
     public function trigger_javascript($url) {
-        if (!stristr($url, "http://"))
+        if (!stristr($url, "http://")) {
             $url = $this->_ci->config->item('base_url') . $url;
+        }
         
-        return "\n\t" . '<script src="' . htmlspecialchars(strip_tags($url)) . '"></script>';
+        return '<script src="' . htmlspecialchars(strip_tags($url)) . '"></script>' . "\n\t";
     }
     
     /**
@@ -240,15 +250,16 @@ class Template {
         $name = htmlspecialchars(strip_tags($name));
         $value = htmlspecialchars(strip_tags($value));
         
-        if ($name == 'keywords' and !strpos($value, ','))
+        if ($name == 'keywords' and !strpos($value, ',')) {
             $content = preg_replace('/[\s]+/', ', ', trim($value));
+        }
         
         switch ($type) {
             case 'meta' :
-                $content = "\n\t" . '<meta name="' . $name . '" content="' . $value . '" />';
+                $content = '<meta name="' . $name . '" content="' . $value . '" />' . "\n\t";
                 break;
             case 'link' :
-                $content = "\n\t" . '<link rel="' . $name . '" href="' . $value . '" />';
+                $content = '<link rel="' . $name . '" href="' . $value . '" />' . "\n\t";
                 break;
         }
         
@@ -407,10 +418,11 @@ class Partial {
         if (!$this->_cached) {
             $content = $this->_ci->load->view($view, array_merge($this->_args, $data), true);
             
-            if ($overwrite)
+            if ($overwrite) {
                 $this->set($content);
-            else
+            } else {
                 $this->append($content);
+            }
         }
         return $this;
     }
@@ -424,15 +436,17 @@ class Partial {
      */
     public function parse($view, $data = array(), $overwrite = false) {
         if (!$this->_cached) {
-            if (!class_exists('CI_Parser'))
+            if (!class_exists('CI_Parser')) {
                 $this->_ci->load->library("parser");
+            }
             
             $content = $this->_ci->parser->parse($view, array_merge($this->_args, $data), true);
             
-            if ($overwrite)
+            if ($overwrite) {
                 $this->set($content);
-            else
+            } else {
                 $this->append($content);
+            }
         }
         return $this;
     }
@@ -448,10 +462,11 @@ class Partial {
         if (!$this->_cached) {
             $widget = $this->template->widget($name, $data);
             
-            if ($overwrite)
+            if ($overwrite) {
                 $this->set($widget->content());
-            else
+            } else {
                 $this->append($widget->content());
+            }
         }
         return $this;
     }
@@ -462,8 +477,9 @@ class Partial {
      * @param mixed $identifier
      */
     public function cache($ttl = 60, $identifier = "") {
-        if (!class_exists("CI_Cache"))
+        if (!class_exists("CI_Cache")) {
             $this->_ci->load->driver('cache', array('adapter' => 'file'));
+        }
         
         $this->_ttl = $ttl;
         $this->_identifier = $identifier;
@@ -480,10 +496,11 @@ class Partial {
      * @return string
      */
     private function cache_id() {
-        if ($this->_identifier)
+        if ($this->_identifier) {
             return $this->_name . '_' . $this->_identifier . '_' . md5(get_class($this) . implode('', $this->_args));
-        else
+        } else {
             return $this->_name . '_' . md5(get_class($this) . implode('', $this->_args));
+        }
     }
     
     /**
@@ -492,10 +509,11 @@ class Partial {
      * @return string
      */
     private function trigger($args) {
-        if (!$this->_trigger)
+        if (!$this->_trigger) {
             return implode('', $args);
-        else
+        } else {
             return call_user_func_array($this->_trigger, $args);
+        }
     }
     
     /**
@@ -510,15 +528,17 @@ class Partial {
                 $obj = array_shift($args);
                 $func = array_pop($args);
                 
-                foreach ($args as $trigger)
+                foreach ($args as $trigger) {
                     $obj = $obj->$trigger;
+                }
                 
                 $this->_trigger = array($obj, $func);
             } else {
                 $this->_trigger = reset(func_get_args());
             }
-        } else
+        } else {
             $this->_trigger = FALSE;
+        }
     }
 }
 
@@ -537,8 +557,9 @@ class Widget extends Partial {
                 
                 // if no content is produced but there was direct ouput we set 
                 // that output as content
-                if(!$this->_content && $buffer)
+                if (!$this->_content && $buffer) {
                     $this->set($buffer);
+                }
             }
         }
         
