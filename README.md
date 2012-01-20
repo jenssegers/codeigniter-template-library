@@ -1,7 +1,7 @@
 Codeigniter template library
 ============================
 
-This template library for Codeigniter lets you build complex templates using layouts, partial views and widgets. It's built with the same method chaining support that we are seeing so often in Codeigniter so it feels familiar. This library loads a layout file that uses partial views. These partial view sections are internally represented by Partial Objects managed by the template library. These objects let you modify their content in a user friendly way through method chaining.
+This template library for Codeigniter lets you build complex templates using partial views and widgets. It's built with the same method chaining support that we are seeing so often in Codeigniter so it feels familiar. This library loads a template file that uses partial views. These partial view sections are internally represented by Partial Objects managed by the template library. These objects let you modify their content in a user friendly way through method chaining.
 
 Installation
 ------------
@@ -20,9 +20,9 @@ In your template.php config file you can change following configuration paramete
 	| -------------------------------------------------------------------
 	| This file will contain the settings for the template library.
 	|
-	| 'parser'	= if you want your main layout file to be parsed, set to TRUE
-	| 'layout'	= the filename of the default layout file
-	| 'ttl'		= the time all partials should be cache in seconds, 0 means no global caching
+	| 'parser'	 = if you want your main template file to be parsed, set to TRUE
+	| 'template' = the filename of the default template file
+	| 'ttl'		 = the time all partials should be cache in seconds, 0 means no global caching
 	|
 	| Because of class name duplicates you can auto correct your widget class names,
 	| adding a prefix or suffix will allow you to load widgets with their short name.
@@ -31,19 +31,19 @@ In your template.php config file you can change following configuration paramete
 	| 'widget_suffix'
 	*/
 
-	$config["parser"] = FALSE;
-	$config["layout"] = "layout";
-	$config["ttl"]	  = 0;
+	$config["parser"]  = FALSE;
+	$config["template"] = "template";
+	$config["ttl"]	   = 0;
 
 	$config["widget_prefix"] = "";
 	$config["widget_suffix"] = "_widget";
 
 If you prefer, you can autoload the library by adjusting your autoload.php file and add 'template' to the $autoload['libraries'] array.
 	
-Layout files
-------------
+Template files
+--------------
 
-Layout files are loaded or parsed by Codeigniter and the partials are passed to them as data. You can easily load them like you would normally use data in your view files:
+Template files are loaded or parsed by Codeigniter and the partials are passed to them as data. You can easily load them like you would normally use data in your view files:
 
 	<head>
 		<title><?php echo $title; ?></title>
@@ -55,7 +55,7 @@ Layout files are loaded or parsed by Codeigniter and the partials are passed to 
 
 Or when parsing is enabled you can use {content} etc.
 
-However, I prefer to directly call the library's methods from inside the layout file to work around php's Undefined variable errors when you are not setting all partials. Calling these methods well replace non-existing partials with empty one's so you don't get any errors:
+However, I prefer to directly call the library's methods from inside the template file to work around php's Undefined variable errors when you are not setting all partials. Calling these methods well replace non-existing partials with empty one's so you don't get any errors:
 
 	<head>
 		<title><?php echo $this->template->title; ?></title>
@@ -65,7 +65,7 @@ However, I prefer to directly call the library's methods from inside the layout 
 		<?php echo $this->template->content; ?>
 	</body>
 
-These variables are in fact Partial Ojects, so you can still manipulate them from inside the layout view file like this:
+These variables are in fact Partial Ojects, so you can still manipulate them from inside the template view file like this:
 
 	<?php echo $title->prepend("My Website - "); ?>
 
@@ -106,32 +106,36 @@ Publishing
 
 The template class only has a few methods. I chose to do this because almost everything can be managed by using the flexible Partial Object. If you want to publish the entire template with the current partials to the output you can use the publish() method.
 
-You can pass a custom layout file and optional data if wanted:
+You can pass a custom template file and optional data if wanted:
 
-	$this->template->publish("layout", array("title"=>"Title is overwritten!"));
+	$this->template->publish("template", array("title"=>"Title is overwritten!"));
 
-Most of the time this will be empty using the layout file from the config:
+Most of the time this will be empty using the template file from the config:
 
 	$this->template->publish();
+	
+If you wish to set the template file before publishing, eg. in a controller's constructor:
+
+	$this->template->set_template("template2");
 	
 Triggers
 --------
 
 Some partials have built in triggers:
 
-    stylesheet - you only need to pass the source
-    javascript - you only need to pass the source
+    stylesheet - you only need to pass the url
+    javascript - you only need to pass the url
     meta - will convert the arguments to the right meta tag
     title - converts special characters
     description - will convert special characters just like the title
 
 This is an example of what these built in triggers do:
 
-	$this->template->stylesheet->add("stylesheet.css");
-	//<link rel="stylesheet" type="text/css" href="http://myweb.com/stylesheet.css" />
+	$this->template->stylesheet->add("stylesheet.css", "all");
+	//<link rel="stylesheet" href="http://myweb.com/stylesheet.css" media="all" />
 	 
 	$this->template->javascript->add("script.js");
-	//<script type="text/javascript" src="http://myweb.com/script.js"></script>
+	//<script src="http://myweb.com/script.js"></script>
 	 
 	$this->template->meta->add("robots", "index,follow");
 	//<meta name="robots" content="index,follow" />
