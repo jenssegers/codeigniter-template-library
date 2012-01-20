@@ -22,7 +22,7 @@
 
 </div>
 
-<script type="text/javascript">
+<script>
 	var base_url = "<?php echo base_url(); ?>";
 	var site_url = "<?php echo site_url(); ?>";
 </script>
