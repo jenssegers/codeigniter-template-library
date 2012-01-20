@@ -169,13 +169,24 @@ class Template {
      * @return Widget
      */
     public function widget($name, $data = array()) {
+        $name = str_replace('.php', '', trim($name));
+        
+        // determine path and widget class name
+        $path = APPPATH . "widgets/";
+        if (($last_slash = strrpos($name, '/')) !== FALSE) {
+            $path += substr($name, 0, $last_slash);
+            $name = substr($name, $last_slash + 1);
+        }
+        
+        // locate and load the widget class
         $class = $this->_widget_prefix . $name . $this->_widget_suffix;
         if (!class_exists($class)) {
-            if (!file_exists(APPPATH . "widgets/" . $name . EXT))
+            if (!file_exists($path . $name . '.php'))
                 show_error("Widget '" . $name . "' was not found.");
             
-            require_once (APPPATH . "widgets/" . $name . EXT);
+            require_once ($path . $name . '.php');
         }
+        
         $widget = new $class($name, $data);
         
         return $widget;
@@ -518,8 +529,17 @@ class Widget extends Partial {
 	 */
     public function content() {
         if (!$this->_cached) {
-            if (method_exists($this, "display"))
+            if (method_exists($this, "display")) {
+                // capture output
+                ob_start();
                 $this->display($this->_args);
+                $buffer = ob_get_clean();
+                
+                // if no content is produced but there was direct ouput we set 
+                // that output as content
+                if(!$this->_content && $buffer)
+                    $this->set($buffer);
+            }
         }
         
         return parent::content();
