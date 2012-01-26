@@ -8,7 +8,6 @@ Installation
 
 Copy the files to the corresponding folder in your application folder.
 
-
 Configuration
 -------------
 

@@ -217,7 +217,7 @@ class Template {
      * @param string $source
      */
     public function trigger_stylesheet($url, $media = FALSE) {
-        if (!stristr($url, "http://")) {
+        if (!stristr($url, "http://") && !stristr($url, "https://")) {
             $url = $this->_ci->config->item('base_url') . $url;
         }
         
@@ -233,7 +233,7 @@ class Template {
      * @param string $source
      */
     public function trigger_javascript($url) {
-        if (!stristr($url, "http://")) {
+        if (!stristr($url, "http://") && !stristr($url, "https://")) {
             $url = $this->_ci->config->item('base_url') . $url;
         }
         
