@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title><?php echo $this->template->title->default("Welcome!"); ?></title>
+	<title><?php echo $this->template->title->default("Default title"); ?></title>
 	<meta charset="utf-8">
 	<meta name="description" content="<?php echo $this->template->description; ?>">
 	<meta name="author" content="">
@@ -22,10 +22,7 @@
 
 </div>
 
-<script>
-	var base_url = "<?php echo base_url(); ?>";
-	var site_url = "<?php echo site_url(); ?>";
-</script>
+<script src="http://code.jquery.com/jquery-1.7.1.min.js">
 <?php echo $this->template->javascript; ?>
 
 </body>
