@@ -22,20 +22,11 @@ In your template.php config file you can change following configuration paramete
 	| 'parser'	 = if you want your main template file to be parsed, set to TRUE
 	| 'template' = the filename of the default template file
 	| 'ttl'		 = the time all partials should be cache in seconds, 0 means no global caching
-	|
-	| Because of class name duplicates you can auto correct your widget class names,
-	| adding a prefix or suffix will allow you to load widgets with their short name.
-	|
-	| 'widget_prefix'
-	| 'widget_suffix'
 	*/
 
 	$config["parser"]  = FALSE;
 	$config["template"] = "template";
 	$config["ttl"]	   = 0;
-
-	$config["widget_prefix"] = "";
-	$config["widget_suffix"] = "_widget";
 
 If you prefer, you can autoload the library by adjusting your autoload.php file and add 'template' to the $autoload['libraries'] array.
 	
@@ -158,7 +149,7 @@ Widget
 
 Widgets are intelligent partial objects. When their content is asked, their display() method is activated which will fill the content using codeigniter or partial object methods. Widgets classes are found inside the application/widgets folder. They extend the main Widget class which has the same methods as the Partial class. This is an example widget:
 
-	/* File: widgets/hero.php */
+	/* File: widgets/hero_widget.php */
 	class hero_widget extends Widget {
 		 public function display($args = array()) {
 			 $this->load->model("my_model");
@@ -172,9 +163,7 @@ And this is loaded from a controller like this:
 
 	$this->template->partial->widget("hero_widget", $args = array());
 
-Widgets can have a specific prefix or suffix added to their class name to prevent class name duplicates. You can either set it manually from the config file or use the default _widget suffix. The file and widget name you call from the controllers are without the prefix and suffix.
-
-
+	
 Caching
 -------
 

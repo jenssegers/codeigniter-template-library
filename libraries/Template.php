@@ -34,10 +34,6 @@ class Template {
     private $_parser = FALSE;
     private $_ttl = 0;
     
-    /* widget class settings */
-    private $_widget_prefix = "";
-    private $_widget_suffix = "_widget";
-    
     private $_ci;
     private $_partials = array();
     
@@ -187,7 +183,7 @@ class Template {
         }
         
         // locate and load the widget class
-        $class = $this->_widget_prefix . $name . $this->_widget_suffix;
+        $class = ucfirst($name);
         if (!class_exists($class)) {
             if (!file_exists($path . $name . '.php')) {
                 show_error("Widget '" . $name . "' was not found.");
