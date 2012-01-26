@@ -12,7 +12,7 @@
 
 <div class="container">
 
-  <?php echo $this->template->widget("hero", array("title"=>"Hello, world!")); ?>
+  <?php echo $this->template->widget("hero_widget", array("title"=>"Hello, world!")); ?>
 
   <?php echo $this->template->content; ?>
 
