@@ -136,10 +136,10 @@ This is an example of what these built in triggers do:
 You can set your own triggers for functions or methods for any partial object like this:
 
 	//function
-	$this->template->partial->set_trigger("strtoupper");
+	$this->template->partial->bind("strtoupper");
 	 
 	//method
-	$this->template->partial->set_trigger($this->typography, "auto_typography");
+	$this->template->partial->bind($this->typography, "auto_typography");
 
 This will trigger the function or method whenever you manipulate the partial's content.
 

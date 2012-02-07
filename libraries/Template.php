@@ -207,6 +207,8 @@ class Template {
         
         $this->_ttl = $ttl;
     }
+	
+	// ---- TRIGGERS -----------------------------------------------------------------------------------------------------
     
     /**
      * Stylesheet trigger
@@ -309,13 +311,16 @@ class Partial {
     }
     
     /**
-     * Alias method
+     * Alias methods
      */
     function __call($name, $args) {
         switch ($name) {
             case "default" :
                 return call_user_func_array(array($this, "set_default"), $args);
                 break;
+			case "bind" :
+				return call_user_func_array(array($this, "set_trigger"), $args);
+				break;
         }
     }
     
