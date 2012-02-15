@@ -207,15 +207,26 @@ class Template {
         
         $this->_ttl = $ttl;
     }
-	
-	// ---- TRIGGERS -----------------------------------------------------------------------------------------------------
     
+    // ---- TRIGGERS -----------------------------------------------------------------------------------------------------
+    
+
     /**
      * Stylesheet trigger
      * @param string $source
      */
     public function trigger_stylesheet($url, $media = FALSE) {
-        if (!stristr($url, "http://") && !stristr($url, "https://")) {
+        // array support
+        if (is_array($url)) {
+            $return = "";
+            foreach ($url as $part) {
+                $return .= $this->trigger_stylesheet($part, $media);
+            }
+            
+            return $return;
+        }
+        
+        if (!stristr($url, "http://") && !stristr($url, "https://") && substr($url, 0, 2) != "//") {
             $url = $this->_ci->config->item('base_url') . $url;
         }
         
@@ -231,7 +242,17 @@ class Template {
      * @param string $source
      */
     public function trigger_javascript($url) {
-        if (!stristr($url, "http://") && !stristr($url, "https://")) {
+        // array support
+        if (is_array($url)) {
+            $return = "";
+            foreach ($url as $part) {
+                $return .= $this->trigger_javascript($part);
+            }
+            
+            return $return;
+        }
+        
+        if (!stristr($url, "http://") && !stristr($url, "https://") && substr($url, 0, 2) != "//") {
             $url = $this->_ci->config->item('base_url') . $url;
         }
         
@@ -318,9 +339,9 @@ class Partial {
             case "default" :
                 return call_user_func_array(array($this, "set_default"), $args);
                 break;
-			case "bind" :
-				return call_user_func_array(array($this, "set_trigger"), $args);
-				break;
+            case "bind" :
+                return call_user_func_array(array($this, "set_trigger"), $args);
+                break;
         }
     }
     
