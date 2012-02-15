@@ -216,16 +216,6 @@ class Template {
      * @param string $source
      */
     public function trigger_stylesheet($url, $media = FALSE) {
-        // array support
-        if (is_array($url)) {
-            $return = "";
-            foreach ($url as $part) {
-                $return .= $this->trigger_stylesheet($part, $media);
-            }
-            
-            return $return;
-        }
-        
         if (!stristr($url, "http://") && !stristr($url, "https://") && substr($url, 0, 2) != "//") {
             $url = $this->_ci->config->item('base_url') . $url;
         }
@@ -242,16 +232,6 @@ class Template {
      * @param string $source
      */
     public function trigger_javascript($url) {
-        // array support
-        if (is_array($url)) {
-            $return = "";
-            foreach ($url as $part) {
-                $return .= $this->trigger_javascript($part);
-            }
-            
-            return $return;
-        }
-        
         if (!stristr($url, "http://") && !stristr($url, "https://") && substr($url, 0, 2) != "//") {
             $url = $this->_ci->config->item('base_url') . $url;
         }
@@ -530,7 +510,20 @@ class Partial {
      * @param array $args
      * @return string
      */
-    private function trigger($args) {
+    public function trigger($args) {
+        // array support, if the first argument is an array 
+        // it will fire the trigger for each item
+        if (is_array($args[0])) {
+            $items = $args[0];
+            $result = "";
+            foreach ($items as $item) {
+                $args[0] = $item;
+                $result .= $this->trigger($args);
+            }
+            
+            return $result;
+        }
+        
         if (!$this->_trigger) {
             return implode('', $args);
         } else {
