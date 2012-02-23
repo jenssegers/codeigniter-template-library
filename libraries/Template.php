@@ -418,7 +418,17 @@ class Partial {
      */
     public function view($view, $data = array(), $overwrite = false) {
         if (!$this->_cached) {
-            $content = $this->_ci->load->view($view, array_merge($this->_args, $data), true);
+            
+            // better object to array
+            if (is_object($data)) {
+                $array = array();
+                foreach ($data as $k => $v) {
+                    $array[$k] = $v;
+                }
+                $data = $array;
+            }
+            
+            $content = $this->_ci->load->view($view, $data, true);
             
             if ($overwrite) {
                 $this->set($content);
@@ -442,7 +452,16 @@ class Partial {
                 $this->_ci->load->library("parser");
             }
             
-            $content = $this->_ci->parser->parse($view, array_merge($this->_args, $data), true);
+            // better object to array
+            if (is_object($data)) {
+                $array = array();
+                foreach ($data as $k => $v) {
+                    $array[$k] = $v;
+                }
+                $data = $array;
+            }
+            
+            $content = $this->_ci->parser->parse($view, $data, true);
             
             if ($overwrite) {
                 $this->set($content);
