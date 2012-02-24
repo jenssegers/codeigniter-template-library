@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
 	<title><?php echo $this->template->title->default("Default title"); ?></title>
@@ -22,7 +22,7 @@
 
 </div>
 
-<script src="http://code.jquery.com/jquery-1.7.1.min.js">
+<script src="//code.jquery.com/jquery-latest.min.js"></script>
 <?php echo $this->template->javascript; ?>
 
 </body>

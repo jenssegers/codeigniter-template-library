@@ -63,7 +63,7 @@ class Template {
         }
         
         if ($this->_widget_path == '') {
-        	$this->_widget_path = APPPATH . 'widgets/';
+            $this->_widget_path = APPPATH . 'widgets/';
         }
         
         if ($this->_parser && !class_exists('CI_Parser')) {
@@ -113,7 +113,7 @@ class Template {
      * @param array $data
      */
     public function publish($template = FALSE, $data = array()) {
-        if (is_array($template)) {
+        if (is_array($template) || is_object($template)) {
             $data = $template;
         } else if ($template) {
             $this->_template = $template;
