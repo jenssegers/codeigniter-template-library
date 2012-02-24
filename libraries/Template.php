@@ -30,9 +30,10 @@ if (!defined("BASEPATH"))
 class Template {
     
     /* default values */
-    private $_template = "template";
+    private $_template = 'template';
     private $_parser = FALSE;
     private $_ttl = 0;
+    private $_widget_path = '';
     
     private $_ci;
     private $_partials = array();
@@ -59,6 +60,10 @@ class Template {
     public function initialize($config = array()) {
         foreach ($config as $key => $val) {
             $this->{'_' . $key} = $val;
+        }
+        
+        if ($this->_widget_path == '') {
+        	$this->_widget_path = APPPATH . 'widgets/';
         }
         
         if ($this->_parser && !class_exists('CI_Parser')) {
@@ -115,10 +120,10 @@ class Template {
         }
         
         if (!$this->_template) {
-            show_error("There was no template file selected for the current template");
+            show_error('There was no template file selected for the current template');
         }
         
-        if (is_array($data)) {
+        if (is_array($data) || is_object($data)) {
             foreach ($data as $name => $content) {
                 $this->partial($name)->set($content);
             }
@@ -151,8 +156,8 @@ class Template {
             }
             
             // detect local triggers
-            if (method_exists($this, "trigger_" . $name)) {
-                $partial->set_trigger($this, "trigger_" . $name);
+            if (method_exists($this, 'trigger_' . $name)) {
+                $partial->bind($this, 'trigger_' . $name);
             }
             
             $this->_partials[$name] = $partial;
@@ -176,7 +181,7 @@ class Template {
         $name = str_replace('.php', '', trim($name));
         
         // determine path and widget class name
-        $path = APPPATH . "widgets/";
+        $path = $this->_widget_path;
         if (($last_slash = strrpos($name, '/')) !== FALSE) {
             $path += substr($name, 0, $last_slash);
             $name = substr($name, $last_slash + 1);
@@ -200,7 +205,7 @@ class Template {
      * @param int $ttl
      * @param mixed $identifier
      */
-    public function cache($ttl = 60, $identifier = "") {
+    public function cache($ttl = 60, $identifier = '') {
         foreach ($this->_partials as $partial) {
             $partial->cache($ttl, $identifier);
         }
@@ -216,7 +221,16 @@ class Template {
      * @param string $source
      */
     public function trigger_stylesheet($url, $media = FALSE) {
-        if (!stristr($url, "http://") && !stristr($url, "https://") && substr($url, 0, 2) != "//") {
+        // array support
+        if (is_array($url)) {
+            $return = '';
+            foreach ($url as $u) {
+                $return .= $this->trigger_stylesheet($u, $media);
+            }
+            return $url;
+        }
+        
+        if (!stristr($url, 'http://') && !stristr($url, 'https://') && substr($url, 0, 2) != '//') {
             $url = $this->_ci->config->item('base_url') . $url;
         }
         
@@ -232,7 +246,16 @@ class Template {
      * @param string $source
      */
     public function trigger_javascript($url) {
-        if (!stristr($url, "http://") && !stristr($url, "https://") && substr($url, 0, 2) != "//") {
+        // array support
+        if (is_array($url)) {
+            $return = '';
+            foreach ($url as $u) {
+                $return .= $this->trigger_javascript($u);
+            }
+            return $url;
+        }
+        
+        if (!stristr($url, 'http://') && !stristr($url, 'https://') && substr($url, 0, 2) != '//') {
             $url = $this->_ci->config->item('base_url') . $url;
         }
         
@@ -245,7 +268,7 @@ class Template {
      * @param mixed $value
      * @param enum $type
      */
-    public function trigger_meta($name, $value, $type = "meta") {
+    public function trigger_meta($name, $value, $type = 'meta') {
         $name = htmlspecialchars(strip_tags($name));
         $value = htmlspecialchars(strip_tags($value));
         
@@ -316,11 +339,11 @@ class Partial {
      */
     function __call($name, $args) {
         switch ($name) {
-            case "default" :
-                return call_user_func_array(array($this, "set_default"), $args);
+            case 'default' :
+                return call_user_func_array(array($this, 'set_default'), $args);
                 break;
-            case "bind" :
-                return call_user_func_array(array($this, "set_trigger"), $args);
+            case 'add' :
+                return call_user_func_array(array($this, 'append'), $args);
                 break;
         }
     }
@@ -369,16 +392,6 @@ class Partial {
         }
         
         return $this;
-    }
-    
-    /**
-     * Append alias method
-     * @param mixed $content
-     * @return Partial
-     */
-    public function add() {
-        $args = func_get_args();
-        return call_user_func_array(array($this, "append"), $args);
     }
     
     /**
@@ -449,7 +462,7 @@ class Partial {
     public function parse($view, $data = array(), $overwrite = false) {
         if (!$this->_cached) {
             if (!class_exists('CI_Parser')) {
-                $this->_ci->load->library("parser");
+                $this->_ci->load->library('parser');
             }
             
             // better object to array
@@ -469,6 +482,7 @@ class Partial {
                 $this->append($content);
             }
         }
+        
         return $this;
     }
     
@@ -497,8 +511,8 @@ class Partial {
      * @param int $ttl
      * @param mixed $identifier
      */
-    public function cache($ttl = 60, $identifier = "") {
-        if (!class_exists("CI_Cache")) {
+    public function cache($ttl = 60, $identifier = '') {
+        if (!class_exists('CI_Cache')) {
             $this->_ci->load->driver('cache', array('adapter' => 'file'));
         }
         
@@ -530,19 +544,6 @@ class Partial {
      * @return string
      */
     public function trigger($args) {
-        // array support, if the first argument is an array 
-        // it will fire the trigger for each item
-        if (is_array($args[0])) {
-            $items = $args[0];
-            $result = "";
-            foreach ($items as $item) {
-                $args[0] = $item;
-                $result .= $this->trigger($args);
-            }
-            
-            return $result;
-        }
-        
         if (!$this->_trigger) {
             return implode('', $args);
         } else {
@@ -551,11 +552,11 @@ class Partial {
     }
     
     /**
-     * Set a trigger function
-     * Can be used like set_trigger($this, "function"); or set_trigger("function");
+     * Bind a trigger function
+     * Can be used like bind($this, "function") or bind("function")
      * @param mixed $arg
      */
-    public function set_trigger() {
+    public function bind() {
         if ($count = func_num_args()) {
             if ($count >= 2) {
                 $args = func_get_args();
@@ -583,10 +584,10 @@ class Widget extends Partial {
 	 */
     public function content() {
         if (!$this->_cached) {
-            if (method_exists($this, "display")) {
+            if (method_exists($this, 'display')) {
                 // capture output
                 ob_start();
-                $this->display($this->_args);
+                call_user_func_array(array($this, 'display'), $this->_args);
                 $buffer = ob_get_clean();
                 
                 // if no content is produced but there was direct ouput we set 
