@@ -32,7 +32,7 @@ class Template {
     /* default values */
     private $_template = 'template';
     private $_parser = FALSE;
-    private $_ttl = 0;
+    private $_cache_ttl = 0;
     private $_widget_path = '';
     
     private $_ci;
@@ -151,8 +151,8 @@ class Template {
         } else {
             // create new partial
             $partial = new Partial($name);
-            if ($this->_ttl) {
-                $partial->cache($this->_ttl);
+            if ($this->_cache_ttl) {
+                $partial->cache($this->_cache_ttl);
             }
             
             // detect local triggers
@@ -210,7 +210,7 @@ class Template {
             $partial->cache($ttl, $identifier);
         }
         
-        $this->_ttl = $ttl;
+        $this->_cache_ttl = $ttl;
     }
     
     // ---- TRIGGERS -----------------------------------------------------------------------------------------------------
@@ -312,7 +312,7 @@ class Template {
 
 class Partial {
     
-    protected $_ci, $_content, $_name, $_ttl = 0, $_cached = false, $_identifier, $_trigger;
+    protected $_ci, $_content, $_name, $_cache_ttl = 0, $_cached = false, $_identifier, $_trigger;
     protected $_args = array();
     
     /**
@@ -361,8 +361,8 @@ class Partial {
      * @return string
      */
     public function content() {
-        if ($this->_ttl && !$this->_cached) {
-            $this->cache->save($this->cache_id(), $this->_content, $this->_ttl);
+        if ($this->_cache_ttl && !$this->_cached) {
+            $this->cache->save($this->cache_id(), $this->_content, $this->_cache_ttl);
         }
         
         return $this->_content;
@@ -516,7 +516,7 @@ class Partial {
             $this->_ci->load->driver('cache', array('adapter' => 'file'));
         }
         
-        $this->_ttl = $ttl;
+        $this->_cache_ttl = $ttl;
         $this->_identifier = $identifier;
         
         if ($cached = $this->_ci->cache->get($this->cache_id())) {
@@ -587,7 +587,7 @@ class Widget extends Partial {
             if (method_exists($this, 'display')) {
                 // capture output
                 ob_start();
-                call_user_func_array(array($this, 'display'), $this->_args);
+                $this->display($this->_args);
                 $buffer = ob_get_clean();
                 
                 // if no content is produced but there was direct ouput we set 
