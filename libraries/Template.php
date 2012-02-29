@@ -136,10 +136,6 @@ class Template {
         } else {
             $this->_ci->load->view($this->_template, $this->_partials);
         }
-        
-        // release partials
-        unset($this->_partials);
-        $this->_partials = array();
     }
     
     /**
