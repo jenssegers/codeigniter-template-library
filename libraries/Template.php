@@ -193,6 +193,9 @@ class Template {
 	        foreach (array(ucfirst($class), strtolower($class)) as $class) {
 	        	if (file_exists($path . $class . '.php')) {
 	        		include_once ($path . $class . '.php');
+	        		
+	        		// found the file, stop looking
+	        		break;
 	        	}
 	        }
         }
