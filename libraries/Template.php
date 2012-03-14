@@ -201,7 +201,7 @@ class Template {
         	show_error("Widget '" . $class . "' was not found.");
         }
         
-        return new $class($data);
+        return new $class($class, $data);
     }
     
     /**
@@ -316,16 +316,17 @@ class Template {
 
 class Partial {
     
-    protected $_ci, $_content, $_cache_ttl = 0, $_cached = false, $_identifier, $_trigger;
+    protected $_ci, $_content, $_name, $_cache_ttl = 0, $_cached = false, $_identifier, $_trigger;
     protected $_args = array();
     
     /**
      * Construct with optional parameters
      * @param array $args
      */
-    public function __construct($args = array()) {
+    public function __construct($name, $args = array()) {
         $this->_ci = &get_instance();
         $this->_args = $args;
+        $this->_name = $name;
     }
     
     /**
@@ -535,9 +536,9 @@ class Partial {
      */
     private function cache_id() {
         if ($this->_identifier) {
-            return get_class($this) . '_' . $this->_identifier . '_' . md5(get_class($this) . implode('', $this->_args));
+            return $this->_name . '_' . $this->_identifier . '_' . md5(get_class($this) . implode('', $this->_args));
         } else {
-            return get_class($this) . '_' . md5(get_class($this) . implode('', $this->_args));
+            return $this->_name . '_' . md5(get_class($this) . implode('', $this->_args));
         }
     }
     
