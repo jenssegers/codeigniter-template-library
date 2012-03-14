@@ -178,26 +178,30 @@ class Template {
      * @return Widget
      */
     public function widget($name, $data = array()) {
-        $name = str_replace('.php', '', trim($name));
+        $class = str_replace('.php', '', trim($name, '/'));
         
         // determine path and widget class name
         $path = $this->_widget_path;
-        if (($last_slash = strrpos($name, '/')) !== FALSE) {
-            $path += substr($name, 0, $last_slash);
-            $name = substr($name, $last_slash + 1);
+        if (($last_slash = strrpos($class, '/')) !== FALSE) {
+            $path += substr($class, 0, $last_slash);
+            $class = substr($class, $last_slash + 1);
         }
         
-        // locate and load the widget class
-        $class = ucfirst($name);
+        // new widget
+        if(!class_exists($class)) {
+	        // try both lowercase and capitalized versions
+	        foreach (array(ucfirst($class), strtolower($class)) as $class) {
+	        	if (file_exists($path . $class . '.php')) {
+	        		include_once ($path . $class . '.php');
+	        	}
+	        }
+        }
+        
         if (!class_exists($class)) {
-            if (!file_exists($path . $name . '.php')) {
-                show_error("Widget '" . $name . "' was not found.");
-            }
-            
-            require_once ($path . $name . '.php');
+        	show_error("Widget '" . $class . "' was not found.");
         }
         
-        return new $class($name, $data);
+        return new $class($data);
     }
     
     /**
@@ -312,17 +316,16 @@ class Template {
 
 class Partial {
     
-    protected $_ci, $_content, $_name, $_cache_ttl = 0, $_cached = false, $_identifier, $_trigger;
+    protected $_ci, $_content, $_cache_ttl = 0, $_cached = false, $_identifier, $_trigger;
     protected $_args = array();
     
     /**
      * Construct with optional parameters
      * @param array $args
      */
-    public function __construct($name, $args = array()) {
+    public function __construct($args = array()) {
         $this->_ci = &get_instance();
         $this->_args = $args;
-        $this->_name = $name;
     }
     
     /**
@@ -532,9 +535,9 @@ class Partial {
      */
     private function cache_id() {
         if ($this->_identifier) {
-            return $this->_name . '_' . $this->_identifier . '_' . md5(get_class($this) . implode('', $this->_args));
+            return get_class($this) . '_' . $this->_identifier . '_' . md5(get_class($this) . implode('', $this->_args));
         } else {
-            return $this->_name . '_' . md5(get_class($this) . implode('', $this->_args));
+            return get_class($this) . '_' . md5(get_class($this) . implode('', $this->_args));
         }
     }
     
