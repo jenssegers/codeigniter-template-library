@@ -234,7 +234,7 @@ class Template {
             foreach ($url as $u) {
                 $return .= $this->trigger_stylesheet($u, $media);
             }
-            return $url;
+            return $return;
         }
         
         if (!stristr($url, 'http://') && !stristr($url, 'https://') && substr($url, 0, 2) != '//') {
@@ -259,7 +259,7 @@ class Template {
             foreach ($url as $u) {
                 $return .= $this->trigger_javascript($u);
             }
-            return $url;
+            return $return;
         }
         
         if (!stristr($url, 'http://') && !stristr($url, 'https://') && substr($url, 0, 2) != '//') {
