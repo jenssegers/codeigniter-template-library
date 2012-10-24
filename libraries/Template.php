@@ -203,7 +203,7 @@ class Template {
         if (!class_exists($class)) {
         	show_error("Widget '" . $class . "' was not found.");
         }
-        //return new $class($class, $data);
+       
         if (empty($alias)){
         	$alias = $class;
         }
