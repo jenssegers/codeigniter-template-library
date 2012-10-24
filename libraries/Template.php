@@ -177,9 +177,9 @@ class Template {
      * @param array $data
      * @return Widget
      */
-    public function widget($name, $data = array()) {
-        $class = str_replace('.php', '', trim($name, '/'));
-        
+    public function widget($class_name, $data = array(), $alias = NULL, $collection = FALSE) {
+        $class = str_replace('.php', '', trim($class_name, '/'));
+       
         // determine path and widget class name
         $path = $this->_widget_path;
         if (($last_slash = strrpos($class, '/')) !== FALSE) {
@@ -203,8 +203,17 @@ class Template {
         if (!class_exists($class)) {
         	show_error("Widget '" . $class . "' was not found.");
         }
+        //return new $class($class, $data);
+        if (empty($alias)){
+        	$alias = $class;
+        }
+        if ($collection){
+        	return $this->_partials[$alias][] = new $class($class, $data);
+        }
+        else{
+        	return $this->_partials[$alias] = new $class($class, $data);
+        }
         
-        return new $class($class, $data);
     }
     
     /**
@@ -500,9 +509,9 @@ class Partial {
      * @param bool $overwrite
      * @return Partial
      */
-    public function widget($name, $data = array(), $overwrite = false) {
+    public function widget($name, $data = array(), $overwrite = false, $alias = NULL, $collection = FALSE) {
         if (!$this->_cached) {
-            $widget = $this->template->widget($name, $data);
+            $widget = $this->template->widget($name, $data, $alias, $collection);
             
             if ($overwrite) {
                 $this->set($widget->content());

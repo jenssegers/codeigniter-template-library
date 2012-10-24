@@ -5,8 +5,12 @@ if (!defined('BASEPATH'))
 class Welcome extends CI_Controller {
     
     public function index() {
+    	$this->load->spark('friendly-template/1.1.4');
         $this->template->title = 'Welcome!';
         
+        $this->template->widget("hero_widget", array("title"=>"Hello, world!"), "sidebar", TRUE);
+        $this->template->widget("hero_widget", array("title"=>"Hello, world!"), "sidebar", TRUE);
+         
         // dynamically add a css stylesheet
         $this->template->stylesheet->add('http://twitter.github.com/bootstrap/1.3.0/bootstrap.min.css');
         
