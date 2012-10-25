@@ -34,6 +34,7 @@ class Template {
     private $_parser = FALSE;
     private $_cache_ttl = 0;
     private $_widget_path = '';
+    private $_theme_path = '';
     
     private $_ci;
     private $_partials = array();
@@ -130,11 +131,11 @@ class Template {
         }
         
         unset($data);
-        
+       
         if ($this->_parser) {
-            $this->_ci->parser->parse($this->_template, $this->_partials);
+            $this->_ci->parser->parse($this->_theme_path.$this->_template, $this->_partials);
         } else {
-            $this->_ci->load->view($this->_template, $this->_partials);
+            $this->_ci->load->view($this->_theme_path.$this->_template, $this->_partials);
         }
     }
     
@@ -203,7 +204,7 @@ class Template {
         if (!class_exists($class)) {
         	show_error("Widget '" . $class . "' was not found.");
         }
-       
+        //return new $class($class, $data);
         if (empty($alias)){
         	$alias = $class;
         }
@@ -324,6 +325,15 @@ class Template {
         return htmlspecialchars(strip_tags($description));
     }
 
+    /**
+     * Title trigger, keeps it clean
+     * @param string $name
+     * @param mixed $value
+     * @param enum $type
+     */
+    public function trigger_author($author) {
+    	return htmlspecialchars(strip_tags($author));
+    }
 }
 
 class Partial {
@@ -595,6 +605,21 @@ class Partial {
 
 class Widget extends Partial {
     
+	var $_widget_view_path = '';
+	/**
+	 * Construct with optional parameters
+	 * @param array $args
+	 */
+	public function __construct($name, $args = array()) {
+		parent::__construct($name, $args);
+		if ($this->config->item('widget_views_path'))
+			$this->_widget_view_path = $this->config->item('widget_views_path');
+		
+		
+		$this->_ci = &get_instance();
+		$this->_args = $args;
+		$this->_name = $name;
+	}
     /* (non-PHPdoc)
 	 * @see Partial::content()
 	 */

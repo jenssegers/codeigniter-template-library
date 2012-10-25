@@ -13,3 +13,8 @@
 $config['parser']    = FALSE;
 $config['template']  = 'template';
 $config['cache_ttl'] = 0;
+$config['theme_path'] = '/';
+$config['mobile_path'] = 'mobile/';
+
+$config['widget_views_path'] = $config['theme_path'].'widgets/';
+$config['widget_path'] = APPPATH.'widgets/';
