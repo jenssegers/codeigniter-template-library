@@ -10,14 +10,27 @@
 </head>
 <body>
 
-<div class="container">
+<?php 
+	// This is an example to show that you can load stuff from inside the template file
+	echo $this->template->widget("navigation", array('title' => 'Project name'));
+?>
 
-  <?php echo $this->template->widget("hero_widget", array("title"=>"Hello, world!")); ?>
+<div class="container" style="margin-top: 60px;">
 
-  <?php echo $this->template->content; ?>
+  <?php
+  	// This is the main content partial
+  	echo $this->template->content;
+  ?>
+
+  <hr>
 
   <footer>
-	<p><?php echo $this->template->copyright->default("There is no copyright"); ?></p>
+	<p>
+		<?php 
+			// Show the footer partial, and prepend copyright message
+			echo $this->template->footer->prepend("&copy; Special Company 2012 - ");
+		?>
+	</p>
   </footer>
 
 </div>
