@@ -1,9 +1,9 @@
 <?php
 /**
- * @name		CodeIgniter Template Library
- * @author		Jens Segers
- * @link		http://www.jenssegers.be
- * @license		MIT License Copyright (c) 2012 Jens Segers
+ * @name        CodeIgniter Template Library
+ * @author      Jens Segers
+ * @link        http://www.jenssegers.be
+ * @license     MIT License Copyright (c) 2012 Jens Segers
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -192,19 +192,19 @@ class Template {
         
         // new widget
         if(!class_exists($class)) {
-	        // try both lowercase and capitalized versions
-	        foreach (array(ucfirst($class), strtolower($class)) as $class) {
-	        	if (file_exists($path . $class . '.php')) {
-	        		include_once ($path . $class . '.php');
-	        		
-	        		// found the file, stop looking
-	        		break;
-	        	}
-	        }
+            // try both lowercase and capitalized versions
+            foreach (array(ucfirst($class), strtolower($class)) as $class) {
+                if (file_exists($path . $class . '.php')) {
+                    include_once ($path . $class . '.php');
+                    
+                    // found the file, stop looking
+                    break;
+                }
+            }
         }
         
         if (!class_exists($class)) {
-        	show_error("Widget '" . $class . "' was not found.");
+            show_error("Widget '" . $class . "' was not found.");
         }
         
         return new $class($class, $data);
@@ -590,8 +590,8 @@ class Partial {
 class Widget extends Partial {
     
     /* (non-PHPdoc)
-	 * @see Partial::content()
-	 */
+     * @see Partial::content()
+     */
     public function content() {
         if (!$this->_cached) {
             if (method_exists($this, 'display')) {

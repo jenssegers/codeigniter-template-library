@@ -5,13 +5,13 @@
  */
 class Navigation extends Widget {
 
-	public function display($data) {
-		
-		if (!isset($data['items'])) {
-			$data['items'] = array('Home', 'About', 'Contact');
-		}
+    public function display($data) {
+        
+        if (!isset($data['items'])) {
+            $data['items'] = array('Home', 'About', 'Contact');
+        }
 
-		$this->view('widgets/navigation', $data);
-	}
-	
+        $this->view('widgets/navigation', $data);
+    }
+    
 }
