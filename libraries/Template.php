@@ -45,6 +45,9 @@ class Template {
     public function __construct($config = array()) {
         $this->_ci = & get_instance();
         
+        // set the default widget path with APPPATH
+        $this->_widget_path = APPPATH . 'widgets/';
+        
         if (!empty($config)) {
             $this->initialize($config);
         }
