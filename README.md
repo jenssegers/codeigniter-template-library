@@ -121,7 +121,7 @@ Some partials have built in triggers:
 
 This is an example of what these built in triggers do:
 
-    $this->template->stylesheet->add('stylesheet.css', 'all');
+    $this->template->stylesheet->add('stylesheet.css', array('media' => 'all'));
     //<link rel="stylesheet" href="http://myweb.com/stylesheet.css" media="all" />
      
     $this->template->javascript->add('script.js');

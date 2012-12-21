@@ -230,12 +230,12 @@ class Template {
      * Stylesheet trigger
      * @param string $source
      */
-    public function trigger_stylesheet($url, $media = FALSE) {
+    public function trigger_stylesheet($url, $attributes = FALSE) {
         // array support
         if (is_array($url)) {
             $return = '';
             foreach ($url as $u) {
-                $return .= $this->trigger_stylesheet($u, $media);
+                $return .= $this->trigger_stylesheet($u, $attributes);
             }
             return $return;
         }
@@ -244,8 +244,19 @@ class Template {
             $url = $this->_ci->config->item('base_url') . $url;
         }
         
-        if ($media) {
-            return '<link rel="stylesheet" href="' . htmlspecialchars(strip_tags($url)) . '" media="' . $media . '" />' . "\n\t";
+        // Legacy support for media
+        if (is_string($attributes)) {
+            $attributes = array( 'media' => $attributes );
+        }
+        
+        if (is_array($attributes)) {
+        	$attributeString = "";
+        	
+        	foreach ($attributes as $key => $value) {
+	        	$attributeString .= $key . '="' . $value . '" ';
+        	}
+        	
+            return '<link rel="stylesheet" href="' . htmlspecialchars(strip_tags($url)) . '" ' . $attributeString . '/>' . "\n\t";
         } else {
             return '<link rel="stylesheet" href="' . htmlspecialchars(strip_tags($url)) . '" />' . "\n\t";
         }
