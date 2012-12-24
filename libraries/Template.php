@@ -223,8 +223,7 @@ class Template {
         $this->_cache_ttl = $ttl;
     }
     
-    // ---- TRIGGERS -----------------------------------------------------------------------------------------------------
-    
+    // ---- TRIGGERS -----------------------------------------------------------------
 
     /**
      * Stylesheet trigger
@@ -244,9 +243,9 @@ class Template {
             $url = $this->_ci->config->item('base_url') . $url;
         }
         
-        // Legacy support for media
+        // legacy support for media
         if (is_string($attributes)) {
-            $attributes = array( 'media' => $attributes );
+            $attributes = array('media' => $attributes);
         }
         
         if (is_array($attributes)) {
@@ -256,9 +255,9 @@ class Template {
 	        	$attributeString .= $key . '="' . $value . '" ';
         	}
         	
-            return '<link rel="stylesheet" href="' . htmlspecialchars(strip_tags($url)) . '" ' . $attributeString . '/>' . "\n\t";
+            return '<link rel="stylesheet" href="' . htmlspecialchars(strip_tags($url)) . '" ' . $attributeString . '>' . "\n\t";
         } else {
-            return '<link rel="stylesheet" href="' . htmlspecialchars(strip_tags($url)) . '" />' . "\n\t";
+            return '<link rel="stylesheet" href="' . htmlspecialchars(strip_tags($url)) . '">' . "\n\t";
         }
     }
     
@@ -299,10 +298,10 @@ class Template {
         
         switch ($type) {
             case 'meta' :
-                $content = '<meta name="' . $name . '" content="' . $value . '" />' . "\n\t";
+                $content = '<meta name="' . $name . '" content="' . $value . '">' . "\n\t";
                 break;
             case 'link' :
-                $content = '<link rel="' . $name . '" href="' . $value . '" />' . "\n\t";
+                $content = '<link rel="' . $name . '" href="' . $value . '">' . "\n\t";
                 break;
         }
         
