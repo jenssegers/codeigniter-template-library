@@ -441,6 +441,28 @@ class Partial {
         
         return $this;
     }
+	
+	public function set_default_view($view, $data){
+		
+		if (!$this->_cached) {
+            
+			if (!$this->_content) {
+			
+	            // better object to array
+	            if (is_object($data)) {
+	                $array = array();
+	                foreach ($data as $k => $v) {
+	                    $array[$k] = $v;
+	                }
+	                $data = $array;
+	            }
+	            
+	            $this->set($this->_ci->load->view($view, $data, true));              
+			}
+        }
+		
+        return $this;
+	}
     
     /**
      * Load a view inside this partial, overwrite if wanted
