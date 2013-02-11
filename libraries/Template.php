@@ -362,6 +362,9 @@ class Partial {
             case 'default' :
                 return call_user_func_array(array($this, 'set_default'), $args);
                 break;
+			case 'default_view' :
+                return call_user_func_array(array($this, 'set_default_view'), $args);
+                break;
             case 'add' :
                 return call_user_func_array(array($this, 'append'), $args);
                 break;
@@ -442,22 +445,20 @@ class Partial {
         return $this;
     }
 	
-	public function set_default_view($view, $data){
+	public function set_default_view($view, $data = array(), $parse = FALSE){
 		
 		if (!$this->_cached) {
             
 			if (!$this->_content) {
-			
-	            // better object to array
-	            if (is_object($data)) {
-	                $array = array();
-	                foreach ($data as $k => $v) {
-	                    $array[$k] = $v;
-	                }
-	                $data = $array;
-	            }
-	            
-	            $this->set($this->_ci->load->view($view, $data, true));              
+				            
+				if ($parse){
+					
+					$this->parse($view, $data, TRUE);
+				}
+				else {
+					
+					$this->view($view, $data, TRUE);
+				}	          
 			}
         }
 		
