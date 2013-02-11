@@ -590,6 +590,9 @@ class Partial {
         if (!$this->_trigger) {
             return implode('', $args);
         } else {
+        	
+			$this->_ci->console->log($args);
+			
             return call_user_func_array($this->_trigger, $args);
         }
     }
@@ -601,8 +604,11 @@ class Partial {
      */
     public function bind() {
         if ($count = func_num_args()) {
+        	
+            $args = func_get_args();
+				
             if ($count >= 2) {
-                $args = func_get_args();
+                
                 $obj = array_shift($args);
                 $func = array_pop($args);
                 
@@ -612,7 +618,8 @@ class Partial {
                 
                 $this->_trigger = array($obj, $func);
             } else {
-                $this->_trigger = func_get_args();
+                	
+                $args = reset($args);
             }
         } else {
             $this->_trigger = FALSE;
