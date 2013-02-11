@@ -589,7 +589,7 @@ class Partial {
                 
                 $this->_trigger = array($obj, $func);
             } else {
-                $this->_trigger = reset(func_get_args());
+                $this->_trigger = func_get_args();
             }
         } else {
             $this->_trigger = FALSE;
