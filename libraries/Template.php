@@ -591,8 +591,6 @@ class Partial {
             return implode('', $args);
         } else {
         	
-			$this->_ci->console->log($args);
-			
             return call_user_func_array($this->_trigger, $args);
         }
     }
@@ -619,7 +617,7 @@ class Partial {
                 $this->_trigger = array($obj, $func);
             } else {
                 	
-                $args = reset($args);
+                $this->_trigger = reset($args);
             }
         } else {
             $this->_trigger = FALSE;
