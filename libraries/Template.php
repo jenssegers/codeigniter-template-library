@@ -147,11 +147,10 @@ class Template {
 			
 							$css_file = $this->_autoload_view_css_path . $view . '.css';
 							
-							
-				
+								
 							//try to load css and js with same name
 							if (file_exists($css_file)){
-								$this->_ci->console->log(file_get_contents($css_file));
+
 								$this->stylesheet->add(file_get_contents($css_file), FALSE, TRUE);
 							}
 						}
