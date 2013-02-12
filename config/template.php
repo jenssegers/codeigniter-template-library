@@ -13,3 +13,10 @@
 $config['parser']    = FALSE;
 $config['template']  = 'template';
 $config['cache_ttl'] = 0;
+
+$config['autoload_view_css'] = FALSE;
+$config['autoload_view_css_path'] = 'assets/css/views/';
+
+$config['autoload_view_js'] = FALSE;
+$config['autoload_view_js_path'] = 'assets/js/views/';
+

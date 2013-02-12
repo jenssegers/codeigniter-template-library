@@ -133,6 +133,44 @@ class Template {
         }
         
         unset($data);
+		
+		//autoload view assets
+		if ($this->_autoload_view_css || $this->_autoload_view_js){
+				
+			foreach($this->_partials as $partial){
+				
+				if ($partial->_views){
+					
+					foreach($partial->_views as $view){
+						
+						if ($this->_autoload_view_css){
+			
+							$css_file = $this->_autoload_view_css_path . $view . '.css';
+							
+							
+				
+							//try to load css and js with same name
+							if (file_exists($css_file)){
+								$this->_ci->console->log(file_get_contents($css_file));
+								$this->stylesheet->add(file_get_contents($css_file), FALSE, TRUE);
+							}
+						}
+						
+						if ($this->_autoload_view_js){
+			
+							$js_file = $this->_autoload_view_js_path . $view . '.js';
+							
+							if (file_exists($js_file)){
+								
+								$this->javascript->add(file_get_contents($js_file), TRUE);	
+							}
+						}
+					}
+				}
+				
+			}
+		}
+
         
         if ($this->_parser) {
             $this->_ci->parser->parse($this->_template, $this->_partials);
@@ -229,58 +267,82 @@ class Template {
      * Stylesheet trigger
      * @param string $source
      */
-    public function trigger_stylesheet($url, $attributes = FALSE) {
-        // array support
-        if (is_array($url)) {
-            $return = '';
-            foreach ($url as $u) {
-                $return .= $this->trigger_stylesheet($u, $attributes);
-            }
-            return $return;
-        }
+    public function trigger_stylesheet($url, $attributes = FALSE, $embed = FALSE) {
         
-        if (!stristr($url, 'http://') && !stristr($url, 'https://') && substr($url, 0, 2) != '//') {
-            $url = $this->_ci->config->item('base_url') . $url;
-        }
-        
-        // legacy support for media
-        if (is_string($attributes)) {
-            $attributes = array('media' => $attributes);
-        }
-        
-        if (is_array($attributes)) {
-        	$attributeString = "";
-        	
-        	foreach ($attributes as $key => $value) {
-	        	$attributeString .= $key . '="' . $value . '" ';
-        	}
-        	
-            return '<link rel="stylesheet" href="' . htmlspecialchars(strip_tags($url)) . '" ' . $attributeString . '>' . "\n\t";
-        } else {
-            return '<link rel="stylesheet" href="' . htmlspecialchars(strip_tags($url)) . '">' . "\n\t";
-        }
+		$attributesString = "";
+		
+		if ($attributes !== FALSE){
+		
+			// legacy support for media
+	        if (is_string($attributes)) {
+	            $attributesString = array('media' => $attributes);
+	        }
+	        
+	        if (is_array($attributes)) {
+	        	$attributeString = "";
+	        	
+	        	foreach ($attributes as $key => $value) {
+		        	$attributeString .= $key . '="' . $value . '" ';
+	        	}
+			}
+		}
+			
+		if ($embed){
+			
+			return '<style type="text/css" ' . $attributesString . '>' . $url . '</style>' . "\n\t";
+		}
+		else {
+			
+			// array support
+	        if (is_array($url)) {
+	            $return = '';
+	            foreach ($url as $u) {
+	                $return .= $this->trigger_stylesheet($u, $attributes);
+	            }
+	            return $return;
+	        }
+	        
+	        if (!stristr($url, 'http://') && !stristr($url, 'https://') && substr($url, 0, 2) != '//') {
+	            	
+	            $url = $this->_ci->config->item('base_url') . $url;
+	        }
+	        
+
+	        return '<link rel="stylesheet" href="' . htmlspecialchars(strip_tags($url)) . '" ' . $attributeString . '>' . "\n\t";
+		}
     }
     
     /**
      * Javascript trigger
      * @param string $source
      */
-    public function trigger_javascript($url) {
-        // array support
-        if (is_array($url)) {
-            $return = '';
-            foreach ($url as $u) {
-                $return .= $this->trigger_javascript($u);
-            }
-            return $return;
-        }
-        
-        if (!stristr($url, 'http://') && !stristr($url, 'https://') && substr($url, 0, 2) != '//') {
-            $url = $this->_ci->config->item('base_url') . $url;
-        }
-        
-        return '<script src="' . htmlspecialchars(strip_tags($url)) . '"></script>' . "\n\t";
-    }
+    public function trigger_javascript($url, $embed = FALSE) {
+       
+		if ($embed){
+			
+			return '<script type="text/javascript">' . $url . '</script>' . "\n\t";
+		}
+		else {
+			
+			 // array support
+	        if (is_array($url)) {
+	            $return = '';
+	            foreach ($url as $u) {
+	                $return .= $this->trigger_javascript($u);
+	            }
+	            return $return;
+	        }
+
+			if (!stristr($url, 'http://') && !stristr($url, 'https://') && substr($url, 0, 2) != '//') {
+	            	
+	            $url = $this->_ci->config->item('base_url') . $url;
+	        }
+			
+			return '<script src="' . htmlspecialchars(strip_tags($url)) . '"></script>' . "\n\t";
+			
+    	}
+	}
+	
     
     /**
      * Meta trigger
@@ -334,6 +396,7 @@ class Partial {
     
     protected $_ci, $_content, $_name, $_cache_ttl = 0, $_cached = false, $_identifier, $_trigger;
     protected $_args = array();
+	protected $_views = array();
     
     /**
      * Construct with optional parameters
@@ -351,7 +414,7 @@ class Partial {
      * @param string $index
      */
     function __get($name) {
-        return $this->_ci->$name;
+        return $name == '_views' ? $this->_views : $this->_ci->$name;
     }
     
     /**
@@ -473,6 +536,8 @@ class Partial {
      * @return Partial
      */
     public function view($view, $data = array(), $overwrite = false) {
+		
+
         if (!$this->_cached) {
             
             // better object to array
@@ -487,8 +552,14 @@ class Partial {
             $content = $this->_ci->load->view($view, $data, true);
             
             if ($overwrite) {
+            	
+            	$this->_views = array($view);
+                
                 $this->set($content);
             } else {
+                	
+				$this->_views[] = $view;
+					
                 $this->append($content);
             }
         }
@@ -503,6 +574,9 @@ class Partial {
      * @return Partial
      */
     public function parse($view, $data = array(), $overwrite = false) {
+        
+		$this->autoload_view_assets($view);	
+			
         if (!$this->_cached) {
             if (!class_exists('CI_Parser')) {
                 $this->_ci->load->library('parser');
@@ -520,8 +594,15 @@ class Partial {
             $content = $this->_ci->parser->parse($view, $data, true);
             
             if ($overwrite) {
+            	
+				$this->_views = array($view);
+				
                 $this->set($content);
+				
             } else {
+            	
+				$this->_views[] = $view;
+				
                 $this->append($content);
             }
         }
@@ -580,6 +661,7 @@ class Partial {
             return $this->_name . '_' . md5(get_class($this) . implode('', $this->_args));
         }
     }
+	
     
     /**
      * Trigger returns the result if a trigger is set
