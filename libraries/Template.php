@@ -405,6 +405,8 @@ class Partial {
         $this->_ci = &get_instance();
         $this->_args = $args;
         $this->_name = $name;
+		
+		$this->_content = FALSE;
     }
     
     /**
@@ -499,7 +501,7 @@ class Partial {
      */
     public function set_default($default) {
         if (!$this->_cached) {
-            if (!$this->_content) {
+            if ($this->_content === FALSE) {
                 $this->_content = $default;
             }
         }
@@ -511,7 +513,7 @@ class Partial {
 		
 		if (!$this->_cached) {
             
-			if (!$this->_content) {
+			if ($this->_content === FALSE) {
 				            
 				if ($parse){
 					
