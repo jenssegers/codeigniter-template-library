@@ -189,9 +189,9 @@ class Template {
 
         
         if ($this->_parser) {
-            $this->_ci->parser->parse($this->_template, $this->_partials, $return);
+            return $this->_ci->parser->parse($this->_template, $this->_partials, $return);
         } else {
-            $this->_ci->load->view($this->_template, $this->_partials, $return);
+            return $this->_ci->load->view($this->_template, $this->_partials, $return);
         }
     }
     
