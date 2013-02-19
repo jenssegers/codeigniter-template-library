@@ -112,7 +112,7 @@ class Template {
      * @param string $template
      * @param array $data
      */
-    public function publish($template = FALSE, $data = array()) {
+    public function publish($template = FALSE, $data = array(), $return = FALSE) {
         if (is_array($template) || is_object($template)) {
             $data = $template;
         } else if ($template) {
@@ -169,9 +169,9 @@ class Template {
 
         
         if ($this->_parser) {
-            $this->_ci->parser->parse($this->_template, $this->_partials);
+            $this->_ci->parser->parse($this->_template, $this->_partials, $return);
         } else {
-            $this->_ci->load->view($this->_template, $this->_partials);
+            $this->_ci->load->view($this->_template, $this->_partials, $return);
         }
     }
     
