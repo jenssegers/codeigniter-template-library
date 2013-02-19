@@ -109,6 +109,15 @@ class Template {
     }
 	
 	/*
+	 * Returns the currently set template.
+	 * return string template
+	 */
+	public function get_template(){
+		
+		return $this->_template;
+	}
+	
+	/*
 	 * Returns an array of all the templates partials
 	 * @return partial array
 	 */
