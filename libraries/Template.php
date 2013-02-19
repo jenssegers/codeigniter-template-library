@@ -69,6 +69,8 @@ class Template {
         if ($this->_parser && !class_exists('CI_Parser')) {
             $this->_ci->load->library('parser');
         }
+		
+		return $this;
     }
     
     /**
@@ -105,6 +107,15 @@ class Template {
     public function set_template($template) {
         $this->_template = $template;
     }
+	
+	/*
+	 * Returns an array of all the templates partials
+	 * @return partial array
+	 */
+	public function get_partials(){
+		
+		return $this->_partials;
+	}
     
     /**
      * Publish the template with the current partials
