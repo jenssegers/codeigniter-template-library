@@ -34,6 +34,12 @@ class Template {
     private $_parser = FALSE;
     private $_cache_ttl = 0;
     private $_widget_path = '';
+	
+	private $_autoload_view_css = FALSE;
+	private $_autoload_view_css_path = '';
+	
+	private $_autoload_view_js = FALSE;
+	private $_autoload_view_js_path = '';
     
     private $_ci;
     private $_partials = array();
@@ -156,9 +162,9 @@ class Template {
 				
 			foreach($this->_partials as $partial){
 				
-				if ($partial->_views){
+				if ($views = $partial->get_views()){
 					
-					foreach($partial->_views as $view){
+					foreach($views as $view){
 						
 						if ($this->_autoload_view_css){
 			
@@ -432,8 +438,13 @@ class Partial {
      * @param string $index
      */
     function __get($name) {
-        return $name == '_views' ? $this->_views : $this->_ci->$name;
+        return $this->_ci->$name;
     }
+	
+	function get_views(){
+		
+		return $this->_views();
+	}
     
     /**
      * Alias methods
@@ -592,8 +603,6 @@ class Partial {
      * @return Partial
      */
     public function parse($view, $data = array(), $overwrite = false) {
-        
-		$this->autoload_view_assets($view);	
 			
         if (!$this->_cached) {
             if (!class_exists('CI_Parser')) {
